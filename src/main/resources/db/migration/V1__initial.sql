@@ -26,7 +26,7 @@ CREATE TABLE public.country
     PRIMARY KEY (id)
 );
 
-CREATE TABLE public."user"(
+CREATE TABLE public.usr(
     id serial NOT NULL,
     username character varying(100) NOT NULL,
     password character varying(100) NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE public.student
     user_id bigint NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT user_id_fk FOREIGN KEY (user_id)
-        REFERENCES public."user" (id) MATCH SIMPLE
+        REFERENCES public.usr (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
@@ -68,7 +68,7 @@ CREATE TABLE public.instructor
     user_id bigint NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT instructor_user_id_fk FOREIGN KEY (user_id)
-        REFERENCES public."user" (id) MATCH SIMPLE
+        REFERENCES public.usr (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
@@ -96,8 +96,8 @@ CREATE TABLE public.course
 CREATE TABLE public.course_instructor
 (
     id serial NOT NULL,
-    course_id integer NOT NULL,
-    instructor_id integer NOT NULL,
+    course_id bigint NOT NULL,
+    instructor_id bigint NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT course_id_fk FOREIGN KEY (course_id)
         REFERENCES public.course (id) MATCH SIMPLE
@@ -114,8 +114,8 @@ CREATE TABLE public.course_instructor
 CREATE TABLE public.course_student
 (
     id serial NOT NULL,
-    course_id integer NOT NULL,
-    student_id integer NOT NULL,
+    course_id bigint NOT NULL,
+    student_id bigint NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT course_id_foreign_key FOREIGN KEY (course_id)
         REFERENCES public.course (id) MATCH SIMPLE
@@ -132,7 +132,7 @@ CREATE TABLE public.course_student
 CREATE TABLE public.course_class
 (
     id serial NOT NULL,
-    course_id integer NOT NULL,
+    course_id bigint NOT NULL,
     class_content character varying(150) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT crs_id_fk FOREIGN KEY (course_id)
@@ -145,8 +145,8 @@ CREATE TABLE public.course_class
 CREATE TABLE public.attendance
 (
     id serial NOT NULL,
-    student_id integer NOT NULL,
-    class_id integer NOT NULL,
+    student_id bigint NOT NULL,
+    class_id bigint NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT std_id_foreignk FOREIGN KEY (student_id)
         REFERENCES public.student (id) MATCH SIMPLE
