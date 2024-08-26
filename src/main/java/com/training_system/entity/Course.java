@@ -5,8 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
+
+import java.util.Set;
+
 import com.training_system.entity.CourseStatus;
 
 @Entity
@@ -23,6 +28,18 @@ public class Course {
 	@JoinColumn(name = "status_id")
 	private CourseStatus status;
 	
-	private double price;
+	private Double price;
+	
+	@ManyToOne
+	@JoinColumn(name="instructor_id")
+	private Instructor instructor;
+	
+	@ManyToMany
+	@JoinTable(
+			name = "course_student",
+			joinColumns = @JoinColumn(name="course_id"),
+			inverseJoinColumns = @JoinColumn(name="student_id")
+			)
+	private Set<Student> students;
 	
 }
