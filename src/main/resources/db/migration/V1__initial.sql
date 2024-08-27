@@ -12,6 +12,7 @@ CREATE TABLE public.course_status
     PRIMARY KEY (id)
 );
 
+
 CREATE TABLE public.country
 (
     id serial NOT NULL,
@@ -25,6 +26,18 @@ CREATE TABLE public.usr(
     password character varying(100) NOT NULL,
     email character varying(100) NOT NULL UNIQUE,
     PRIMARY KEY (id)
+);
+
+CREATE TABLE public.users_roles
+(
+	id serial PRIMARY KEY,
+	user_id bigint NOT NULL,
+	role_id bigint NOT NULL,
+	CONSTRAINT uq_user_role UNIQUE(user_id,role_id),
+	CONSTRAINT user_fk FOREIGN KEY(user_id)
+	REFERENCES usr(id),
+	CONSTRAINT role_fk FOREIGN KEY(role_id)
+	REFERENCES role(id)
 );
 
 CREATE TABLE public.student

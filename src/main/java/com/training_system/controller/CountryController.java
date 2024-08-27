@@ -4,13 +4,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.training_system.base.BaseControllerImpl;
-import com.training_system.entity.Instructor;
+import com.training_system.entity.Country;
 
 @RestController
-@RequestMapping("/api/instructor")
-public class InstructorController extends BaseControllerImpl<Instructor, Long> {
+@RequestMapping("/api/Country")
+public class CountryController extends BaseControllerImpl<Country, Long> {
 
-//	@Autowired
-//	private InstructorService instructorService ;
-//	
 }

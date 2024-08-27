@@ -3,6 +3,11 @@ package com.training_system.base;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 public abstract class BaseControllerImpl<T extends BaseEntity<ID>,ID> implements BaseController<T, ID>{
 
@@ -10,22 +15,26 @@ public abstract class BaseControllerImpl<T extends BaseEntity<ID>,ID> implements
 	BaseService<T, ID> baseService;
 
 	@Override
+	@GetMapping
 	public List<T> findAll() {
 		return baseService.findAll();
 	}
 
 	@Override
-	public T findById(ID id) {
+	@GetMapping("/{id}")
+	public T findById(@PathVariable ID id) {
 		return baseService.findById(id);
 	}
 
 	@Override
-	public T Insert(T entity) {
+	@PostMapping
+	public T Insert(@RequestBody T entity) {
 		return baseService.insert(entity);
 	}
 
 	@Override
-	public T update(T entity) {
+	@PutMapping
+	public T update(@RequestBody T entity) {
 		return baseService.update(entity);
 	}
 	
