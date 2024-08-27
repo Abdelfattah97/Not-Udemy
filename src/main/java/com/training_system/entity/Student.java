@@ -32,9 +32,8 @@ public class Student extends BaseEntity<Long>  {
 	@JoinColumn(name = "country_id")
 	private Country country; 
 	
-	// I am not sure about the relation !! 
 	@OneToOne
-	@JoinColumn(name = "user_id")
+	@JoinColumn(name = "user_id",nullable = false , unique = true)
 	private User user; 
 	
 	@ManyToMany(mappedBy = "students")

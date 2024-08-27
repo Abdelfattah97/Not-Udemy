@@ -1,10 +1,3 @@
-CREATE TABLE public.user_type
-(
-    id bigint NOT NULL,
-    type_name character varying(20) NOT NULL,
-    PRIMARY KEY (id)
-);
-
 CREATE TABLE public.role
 (
     id bigint NOT NULL,
@@ -28,16 +21,10 @@ CREATE TABLE public.country
 
 CREATE TABLE public.usr(
     id serial NOT NULL,
-    username character varying(100) NOT NULL,
+    username character varying(100) NOT NULL UNIQUE,
     password character varying(100) NOT NULL,
-    email character varying(100) NOT NULL,
-    user_type_id bigint NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT user_type_id_fk FOREIGN KEY (user_type_id)
-        REFERENCES public.user_type (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
+    email character varying(100) NOT NULL UNIQUE,
+    PRIMARY KEY (id)
 );
 
 CREATE TABLE public.student
@@ -45,7 +32,7 @@ CREATE TABLE public.student
     id serial NOT NULL,
     name character varying(100) NOT NULL,
     country_id bigint,
-    user_id bigint NOT NULL,
+    user_id bigint NOT NULL UNIQUE,
     PRIMARY KEY (id),
     CONSTRAINT user_id_fk FOREIGN KEY (user_id)
         REFERENCES public.usr (id) MATCH SIMPLE
@@ -65,7 +52,7 @@ CREATE TABLE public.instructor
     id serial NOT NULL,
     name character varying(100) NOT NULL,
     country_id bigint,
-    user_id bigint NOT NULL,
+    user_id bigint NOT NULL UNIQUE,
     PRIMARY KEY (id),
     CONSTRAINT instructor_user_id_fk FOREIGN KEY (user_id)
         REFERENCES public.usr (id) MATCH SIMPLE
@@ -98,13 +85,30 @@ CREATE TABLE public.course
 	    ON DELETE NO ACTION
 	    NOT VALID
 );
+CREATE TABLE public.payment_method
+(
+id serial primary key,
+name varchar(50) not null unique
+);
+
+CREATE TABLE public.payment
+(
+id serial PRIMARY KEY ,
+pay_method_id bigint not null ,
+pay_amount double precision not null,
+CONSTRAINT payment_method_fk FOREIGN KEY(pay_method_id)
+REFERENCES public.payment_method(id)
+);
 
 CREATE TABLE public.course_student
 (
     id serial NOT NULL,
     course_id bigint NOT NULL,
     student_id bigint NOT NULL,
+    pay_id bigint NOT NULL UNIQUE,
+    is_confirmed BOOLEAN NOT NULL DEFAULT(false),
     PRIMARY KEY (id),
+    CONSTRAINT uq_enrollment UNIQUE(course_id,student_id),
     CONSTRAINT course_id_foreign_key FOREIGN KEY (course_id)
         REFERENCES public.course (id) MATCH SIMPLE
         ON UPDATE NO ACTION
@@ -122,6 +126,7 @@ CREATE TABLE public.lesson
     id serial NOT NULL,
     course_id bigint NOT NULL,
     title character varying(150) NOT NULL,
+    file_path TEXT NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT crs_id_fk FOREIGN KEY (course_id)
         REFERENCES public.course (id) MATCH SIMPLE
@@ -147,3 +152,4 @@ CREATE TABLE public.attendance
         ON DELETE NO ACTION
         NOT VALID
 );
+insert into course_status values(1,'public');
