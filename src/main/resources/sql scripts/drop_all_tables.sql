@@ -10,4 +10,7 @@ drop table if exists  lesson cascade;
 drop table if exists  course_status cascade;
 drop table if exists  course_student cascade;
 drop table if exists  course_instructor cascade;
+drop table if exists payment cascade;
+drop table if exists payment_method cascade;
+drop table if exists users_roles cascade;
 delete from public.flyway_schema_history;
