@@ -1,9 +1,11 @@
 package com.training_system.repo;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import com.training_system.base.BaseRepository;
 import com.training_system.entity.Course;
 
-public interface CourseRepo extends JpaRepository<Course,Long>{
+@Repository
+public interface CourseRepo extends BaseRepository<Course,Long>{
 
 }

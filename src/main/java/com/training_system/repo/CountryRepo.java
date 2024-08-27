@@ -1,9 +1,11 @@
 package com.training_system.repo;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import com.training_system.base.BaseRepository;
 import com.training_system.entity.Country;
 
-public interface CountryRepo extends JpaRepository<Country, Long>{
+@Repository
+public interface CountryRepo extends BaseRepository<Country, Long>{
 
 }

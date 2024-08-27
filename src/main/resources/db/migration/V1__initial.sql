@@ -1,20 +1,20 @@
 CREATE TABLE public.user_type
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     type_name character varying(20) NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE public.role
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     name character varying(20) NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE public.course_status
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     status_name character varying NOT NULL,
     PRIMARY KEY (id)
 );
@@ -85,27 +85,12 @@ CREATE TABLE public.course
     title character varying(100) NOT NULL,
     status_id bigint NOT NULL,
     price double precision NOT NULL DEFAULT 0,
+    instructor_id bigint NOT NULL ,
     PRIMARY KEY (id),
+    CONSTRAINT course_instructor_fk FOREIGN KEY(instructor_id)
+    REFERENCES public.instructor(id),
     CONSTRAINT course_status_id_fk FOREIGN KEY (status_id)
         REFERENCES public.course_status (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
-);
-
-CREATE TABLE public.course_instructor
-(
-    id serial NOT NULL,
-    course_id bigint NOT NULL,
-    instructor_id bigint NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT course_id_fk FOREIGN KEY (course_id)
-        REFERENCES public.course (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
-    CONSTRAINT inst_id_fk FOREIGN KEY (instructor_id)
-        REFERENCES public.instructor (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID
