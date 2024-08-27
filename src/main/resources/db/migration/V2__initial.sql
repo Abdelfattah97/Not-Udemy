@@ -1,20 +1,20 @@
 CREATE TABLE public.user_type
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     type_name character varying(20) NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE public.role
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     name character varying(20) NOT NULL,
     PRIMARY KEY (id)
 );
 
 CREATE TABLE public.course_status
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     status_name character varying NOT NULL,
     PRIMARY KEY (id)
 );
@@ -85,18 +85,15 @@ CREATE TABLE public.course
     title character varying(100) NOT NULL,
     status_id bigint NOT NULL,
     price double precision NOT NULL DEFAULT 0,
-    instructor_id bigint NOT NULL,
+    instructor_id bigint NOT NULL ,
     PRIMARY KEY (id),
+    CONSTRAINT course_instructor_fk FOREIGN KEY(instructor_id)
+    REFERENCES public.instructor(id),
     CONSTRAINT course_status_id_fk FOREIGN KEY (status_id)
         REFERENCES public.course_status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-        NOT VALID,
-    CONSTRAINT course_instructor_identity_fk FOREIGN KEY (instructor_id)
-	    REFERENCES public.instructor (id) MATCH SIMPLE
-	    ON UPDATE NO ACTION
-	    ON DELETE NO ACTION
-	    NOT VALID
+        NOT VALID
 );
 
 CREATE TABLE public.course_student
@@ -117,11 +114,11 @@ CREATE TABLE public.course_student
         NOT VALID
 );
 
-CREATE TABLE public.lesson
+CREATE TABLE public.course_class
 (
     id serial NOT NULL,
     course_id bigint NOT NULL,
-    title character varying(150) NOT NULL,
+    class_content character varying(150) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT crs_id_fk FOREIGN KEY (course_id)
         REFERENCES public.course (id) MATCH SIMPLE
@@ -134,15 +131,15 @@ CREATE TABLE public.attendance
 (
     id serial NOT NULL,
     student_id bigint NOT NULL,
-    lesson_id bigint NOT NULL,
+    class_id bigint NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT std_id_foreignk FOREIGN KEY (student_id)
         REFERENCES public.student (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,
-    CONSTRAINT lesson_id_fk FOREIGN KEY (lesson_id)
-        REFERENCES public.lesson (id) MATCH SIMPLE
+    CONSTRAINT class_id_fk FOREIGN KEY (class_id)
+        REFERENCES public.course_class (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID

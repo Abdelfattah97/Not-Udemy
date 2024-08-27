@@ -29,10 +29,5 @@ public class User extends BaseEntity<Long>  {
 	private String password;
 	
 	private String email;
-	
-	@ManyToOne
-	@JoinColumn(name = "user_type_id")
-	private UserType userType;
 
-	
 }
