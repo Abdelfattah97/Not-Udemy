@@ -4,8 +4,9 @@ import org.springframework.stereotype.Repository;
 
 import com.training_system.base.BaseRepository;
 import com.training_system.entity.Country;
+import com.training_system.entity.Payment;
 
 @Repository
-public interface CountryRepo extends BaseRepository<Country, Long>{
+public interface PaymentRepo extends BaseRepository<Payment, Long>{
 
 }

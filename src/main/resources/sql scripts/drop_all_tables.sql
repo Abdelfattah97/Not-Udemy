@@ -1,0 +1,18 @@
+drop TABLE if exists student CASCADE ;
+drop table if exists  course cascade;
+drop table if exists  country cascade;
+drop table if exists  usr cascade;
+drop table if exists  user_type cascade;
+drop table if exists  "role" cascade;
+drop table if exists  instructor cascade;
+drop table if exists  attendance cascade;
+drop table if exists  lesson cascade;
+drop table if exists  course_status cascade;
+drop table if exists  course_student cascade;
+drop table if exists  course_instructor cascade;
+drop table if exists payment cascade;
+drop table if exists payment_method cascade;
+drop table if exists users_roles cascade;
+drop table if exists person cascade;
+drop table if exists person_user_types cascade;
+delete from public.flyway_schema_history;

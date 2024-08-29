@@ -1,9 +1,11 @@
 package com.training_system.repo;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import com.training_system.base.BaseRepository;
 import com.training_system.entity.User;
 
-public interface UserRepo extends JpaRepository<User,Long>{
+@Repository
+public interface UserRepo extends BaseRepository<User,Long>{
 
 }
