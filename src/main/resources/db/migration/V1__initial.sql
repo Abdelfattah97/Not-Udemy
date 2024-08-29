@@ -40,43 +40,16 @@ CREATE TABLE public.users_roles
 	REFERENCES role(id)
 );
 
-CREATE TABLE public.student
+CREATE TABLE public.person
 (
-    id serial NOT NULL,
-    name character varying(100) NOT NULL,
+	id serial NOT NULL PRIMARY KEY,
+	 name character varying(100) NOT NULL,
     country_id bigint,
     user_id bigint NOT NULL UNIQUE,
-    PRIMARY KEY (id),
     CONSTRAINT user_id_fk FOREIGN KEY (user_id)
-        REFERENCES public.usr (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
+    	REFERENCES public.usr (id),
     CONSTRAINT country_id_fk FOREIGN KEY (country_id)
-        REFERENCES public.country (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
-);
-
-
-CREATE TABLE public.instructor
-(
-    id serial NOT NULL,
-    name character varying(100) NOT NULL,
-    country_id bigint,
-    user_id bigint NOT NULL UNIQUE,
-    PRIMARY KEY (id),
-    CONSTRAINT instructor_user_id_fk FOREIGN KEY (user_id)
-        REFERENCES public.usr (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
-    CONSTRAINT instructor_country_id_fk FOREIGN KEY (country_id)
-        REFERENCES public.country (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
+        REFERENCES public.country (id)
 );
 
 CREATE TABLE public.course
@@ -93,7 +66,7 @@ CREATE TABLE public.course
         ON DELETE NO ACTION
         NOT VALID,
     CONSTRAINT course_instructor_identity_fk FOREIGN KEY (instructor_id)
-	    REFERENCES public.instructor (id) MATCH SIMPLE
+	    REFERENCES public.person (id) MATCH SIMPLE
 	    ON UPDATE NO ACTION
 	    ON DELETE NO ACTION
 	    NOT VALID
@@ -119,6 +92,7 @@ CREATE TABLE public.course_student
     course_id bigint NOT NULL,
     student_id bigint NOT NULL,
     pay_id bigint NOT NULL UNIQUE,
+    enrollment_date DATE NOT NULL,
     is_confirmed BOOLEAN NOT NULL DEFAULT(false),
     PRIMARY KEY (id),
     CONSTRAINT uq_enrollment UNIQUE(course_id,student_id),
@@ -128,7 +102,7 @@ CREATE TABLE public.course_student
         ON DELETE NO ACTION
         NOT VALID,
     CONSTRAINT std_id_foreign_key FOREIGN KEY (student_id)
-        REFERENCES public.student (id) MATCH SIMPLE
+        REFERENCES public.person (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID
@@ -155,7 +129,7 @@ CREATE TABLE public.attendance
     lesson_id bigint NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT std_id_foreignk FOREIGN KEY (student_id)
-        REFERENCES public.student (id) MATCH SIMPLE
+        REFERENCES public.person (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID,

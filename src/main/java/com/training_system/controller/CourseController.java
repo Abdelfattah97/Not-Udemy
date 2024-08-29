@@ -21,7 +21,7 @@ public class CourseController extends BaseControllerImpl<Course, Long> {
 	private CourseService courseService ;
 	
 	@PostMapping("/{course_id}/add-lesson")
-	Lesson addLesson( @PathVariable Long course_id,@RequestBody Lesson lesson ) {
+	Course addLesson( @PathVariable Long course_id,@RequestBody Lesson lesson ) {
 		return courseService.addLesson(course_id,lesson);
 	}
 

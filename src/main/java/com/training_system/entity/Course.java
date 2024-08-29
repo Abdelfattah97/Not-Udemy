@@ -2,8 +2,6 @@ package com.training_system.entity;
 
 import java.util.Set;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import com.training_system.base.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -12,11 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import lombok.Builder.Default;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -43,15 +38,13 @@ public class Course  extends BaseEntity<Long> {
 	
 	@ManyToOne
 	@JoinColumn(name="instructor_id",nullable = false)
-	private Instructor instructor;
+	private Person instructor;
 	
-	@ManyToMany
-	@JoinTable(
-			name = "course_student",
-			joinColumns = @JoinColumn(name="course_id"),
-			inverseJoinColumns = @JoinColumn(name="student_id")
-			)
-	private Set<Student> students;
+	/**
+	 * list of Enrollment that represents students enrollments to a course
+	 */
+	@OneToMany(mappedBy = "course")
+	private Set<Enrollment> enrollments;
 	
 	@OneToMany(mappedBy = "course")
 	private Set<Lesson> lessons;
