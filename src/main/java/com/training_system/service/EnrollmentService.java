@@ -9,14 +9,26 @@ import org.springframework.stereotype.Service;
 import com.training_system.base.BaseServiceImpl;
 import com.training_system.entity.Course;
 import com.training_system.entity.Enrollment;
+import com.training_system.entity.Lesson;
 import com.training_system.entity.Payment;
 import com.training_system.entity.Person;
 import com.training_system.entity.enums.EnrollmentStatus;
 import com.training_system.exceptions.UnknownStatusException;
 import com.training_system.repo.CourseRepo;
 import com.training_system.repo.EnrollmentRepo;
+import com.training_system.repo.LessonRepo;
 import com.training_system.repo.PaymentRepo;
 import com.training_system.repo.PersonRepo;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+
+import java.io.IOException;
+import java.nio.file.Files;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -34,6 +46,9 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	
 	@Autowired
 	private PaymentRepo paymentRepo;
+	
+	@Autowired
+	private LessonRepo lessonRepo;
 	
 	public void enroll(Person student, Course course, Payment payment, LocalDate enrollmentDate, EnrollmentStatus enrollment_status) {
 		Long student_id = student.getId();
@@ -67,13 +82,44 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		if(enrollment.isEmpty()) {
 			throw new EntityNotFoundException("Enrollment with payment id = " + payment_id + " is Not Found!!!");
 		}
-		
+		if(enrollmentStatus.getValue() > 4 || enrollmentStatus.getValue() < 1) {
+			throw new UnknownStatusException("Found unknown enrollment status!!!");
+		}
 		Enrollment enrollmentData = enrollment.get();
 		enrollmentData.setEnrollment_status(enrollmentStatus);
 		enrollmentRepo.save(enrollmentData);
 	}
 	
-	public void attend() {
+	@Transactional
+	public ResponseEntity<Resource> attendLesson(Long lesson_id, Long student_id) throws IOException {
+		if(lessonRepo.findById(lesson_id).isEmpty()) {
+			throw new EntityNotFoundException("Lesson with id = " + lesson_id + " is Not Found!!!");
+		}
+		if(personRepo.findById(student_id).isEmpty()) {
+			throw new EntityNotFoundException("Student with id = " + student_id + " is Not Found!!!");
+		}
 		
+		Person student = personRepo.findById(student_id).get();
+		Lesson lesson = lessonRepo.findById(lesson_id).get();
+		
+		// Load file as a resource
+        Resource resource = new ClassPathResource(lesson.getFilePath());
+        // Determine the file's media type
+        String contentType = Files.probeContentType(resource.getFile().toPath());
+        
+        // Fallback to application/octet-stream if type is unknown
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+		
+		if(!student.getAttendedLessons().contains(lesson)) { // The student has not attended before
+			student.addAttendedLesson(lesson);
+			personRepo.save(student);
+		}
+		
+		return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                .body(resource); //return resource file MP4, PNG, TXT, PDF
 	}
 }

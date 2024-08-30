@@ -20,4 +20,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity violation");
     }
+    
+    @ExceptionHandler(UnknownStatusException.class)
+    public ResponseEntity<String> handleUnknownStatus(UnknownStatusException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Found Unknow Status");
+    }
 }
