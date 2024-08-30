@@ -3,6 +3,7 @@ package com.training_system.entity;
 import java.time.LocalDate;
 
 import com.training_system.base.BaseEntity;
+import com.training_system.entity.enums.EnrollmentStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -46,6 +47,7 @@ public class Enrollment extends BaseEntity<Long> {
 	@Column(name="enrollment_date")
 	private LocalDate enrollmentDate;
 	
-	private boolean isConfirmed;
+	@Column(name="enrollment_status")
+	private EnrollmentStatus enrollment_status;
 	
 }
