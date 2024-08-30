@@ -11,27 +11,37 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+//import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "course_student",
 uniqueConstraints = 
 	    @UniqueConstraint(columnNames = {"person_id", "course_id"})
 )
-@Data
+//@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Enrollment extends BaseEntity<Long> {
 
 	@ManyToOne
 	@JoinColumn(name="student_id",nullable = false)
-	private Person student;
+	private Long student_id;
 	
 	@ManyToOne
 	@JoinColumn(name="course_id")
-	private Course course;
+	private Long course_id;
 	
 	@OneToOne
 	@Column(nullable = false,unique = true)
-	private Payment payment;
+	private Long payment_id;
 	
 	@Column(name="enrollment_date")
 	private LocalDate enrollmentDate;
