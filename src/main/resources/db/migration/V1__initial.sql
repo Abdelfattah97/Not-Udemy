@@ -82,6 +82,8 @@ CREATE TABLE public.payment
 id serial PRIMARY KEY ,
 pay_method_id bigint not null ,
 pay_amount double precision not null,
+transaction_id TEXT not null DEFAULT('Not_Specified'),
+pay_status int not null,
 CONSTRAINT payment_method_fk FOREIGN KEY(pay_method_id)
 REFERENCES public.payment_method(id)
 );
