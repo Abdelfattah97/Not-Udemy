@@ -23,7 +23,10 @@ public class SecurityConfig {
     http.httpBasic(Customizer.withDefaults());
 
     // Enable Form Authentication
-    http.formLogin(form -> form.loginProcessingUrl("/authenticate").permitAll());
+    http.formLogin(form -> form
+        .loginProcessingUrl("/authenticate")
+        .failureHandler((request, response, exception) -> response.setStatus(401))
+        .permitAll());
 
     // Configure Authorization
     http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
