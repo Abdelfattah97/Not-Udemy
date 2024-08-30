@@ -21,7 +21,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "course_student",
 uniqueConstraints = 
-	    @UniqueConstraint(columnNames = {"person_id", "course_id"})
+	    @UniqueConstraint(columnNames = {"student_id", "course_id"})
 )
 //@Data
 @NoArgsConstructor
@@ -33,15 +33,15 @@ public class Enrollment extends BaseEntity<Long> {
 
 	@ManyToOne
 	@JoinColumn(name="student_id",nullable = false)
-	private Long student_id;
+	private Person student;
 	
 	@ManyToOne
 	@JoinColumn(name="course_id")
-	private Long course_id;
+	private Course course;
 	
 	@OneToOne
-	@Column(nullable = false,unique = true)
-	private Long payment_id;
+	@JoinColumn(name="pay_id", nullable = false,unique = true)
+	private Payment payment;
 	
 	@Column(name="enrollment_date")
 	private LocalDate enrollmentDate;
