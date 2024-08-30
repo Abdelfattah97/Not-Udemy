@@ -5,10 +5,17 @@ CREATE TABLE public.role
     PRIMARY KEY (id)
 );
 
+CREATE TABLE public.enrollment_status
+(
+    id integer NOT NULL,
+    status character varying(20) NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE public.course_status
 (
     id bigint NOT NULL,
-    status_name character varying NOT NULL,
+    status_name character varying(20) NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -93,7 +100,7 @@ CREATE TABLE public.course_student
     student_id bigint NOT NULL,
     pay_id bigint NOT NULL UNIQUE,
     enrollment_date DATE NOT NULL,
-    is_confirmed BOOLEAN NOT NULL DEFAULT(false),
+    enrollment_status_id integer NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT uq_enrollment UNIQUE(course_id,student_id),
     CONSTRAINT course_id_foreign_key FOREIGN KEY (course_id)
@@ -103,6 +110,11 @@ CREATE TABLE public.course_student
         NOT VALID,
     CONSTRAINT std_id_foreign_key FOREIGN KEY (student_id)
         REFERENCES public.person (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID,
+    CONSTRAINT enrollment_status_id_fk FOREIGN KEY (enrollment_status_id)
+        REFERENCES public.enrollment_status (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID
@@ -139,4 +151,7 @@ CREATE TABLE public.attendance
         ON DELETE NO ACTION
         NOT VALID
 );
+
+
+
 insert into course_status values(1,'public');
