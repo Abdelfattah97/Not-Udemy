@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
@@ -30,7 +31,7 @@ public class Enrollment extends BaseEntity<Long> {
 	private Course course;
 	
 	@OneToOne
-	@Column(nullable = false,unique = true)
+	@JoinColumn(name="pay_id",nullable = false,unique = true)
 	private Payment payment;
 	
 	@Column(name="enrollment_date")

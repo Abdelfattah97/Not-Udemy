@@ -38,7 +38,7 @@ public class User extends BaseEntity<Long>  {
 	@Column(nullable = false,unique = true)
 	private String email;
 	
-	@OneToOne(cascade = CascadeType.REMOVE)
+	@OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
 	private Person person;
 	
 	@ManyToMany
