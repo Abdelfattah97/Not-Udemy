@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.training_system.base.BaseEntity;
 import com.training_system.converter.CurrencyConverter;
 import com.training_system.converter.PaymentMethodConverter;
+import com.training_system.converter.PaymentStatusConverter;
 import com.training_system.converter.ProductTypeConverter;
 import com.training_system.entity.enums.Currency;
 import com.training_system.entity.enums.PaymentMethod;
+import com.training_system.entity.enums.PaymentStatus;
 import com.training_system.entity.enums.ProductType;
-import com.training_system.payment.test.PaymentStatus;
-import com.training_system.payment.test.PaymentStatusConverter;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;

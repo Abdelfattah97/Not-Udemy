@@ -1,4 +1,6 @@
-package com.training_system.payment.test;
+package com.training_system.converter;
+
+import com.training_system.entity.enums.PaymentStatus;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

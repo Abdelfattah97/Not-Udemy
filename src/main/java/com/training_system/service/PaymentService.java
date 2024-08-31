@@ -11,7 +11,7 @@ import com.training_system.entity.Enrollment;
 import com.training_system.entity.Payment;
 import com.training_system.entity.dto.PaymentRequest;
 import com.training_system.entity.enums.EnrollmentStatus;
-import com.training_system.payment.test.PaymentStatus;
+import com.training_system.entity.enums.PaymentStatus;
 import com.training_system.repo.PaymentRepo;
 
 import jakarta.persistence.criteria.CriteriaBuilder.Case;

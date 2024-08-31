@@ -1,4 +1,4 @@
-package com.training_system.payment.test;
+package com.training_system.entity.enums;
 
 public enum PaymentStatus {
 

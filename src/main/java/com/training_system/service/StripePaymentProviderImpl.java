@@ -18,8 +18,8 @@ import com.stripe.model.Charge;
 import com.training_system.entity.Payment;
 import com.training_system.entity.dto.PaymentRequest;
 import com.training_system.entity.enums.PaymentMethod;
+import com.training_system.entity.enums.PaymentStatus;
 import com.training_system.exceptions.PaymentFailureException;
-import com.training_system.payment.test.PaymentStatus;
 
 import jakarta.annotation.PostConstruct;
 
