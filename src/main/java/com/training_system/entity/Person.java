@@ -49,6 +49,9 @@ public class Person extends BaseEntity<Long> {
 			)
 	private Set<Lesson> attendedLessons;
 	
+	public void addAttendedLesson(Lesson lesson) {
+		attendedLessons.add(lesson);
+	}
 	
 //	@PrePersist
 //	private void convertUserTypeToDBType(){

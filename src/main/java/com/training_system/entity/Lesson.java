@@ -28,4 +28,5 @@ public class Lesson extends BaseEntity<Long>  {
 	@JoinColumn(name="course_id")
 	private Course course;
 	
+	private String filePath;
 }
