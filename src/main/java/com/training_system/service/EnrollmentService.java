@@ -19,16 +19,14 @@ import com.training_system.repo.EnrollmentRepo;
 import com.training_system.repo.LessonRepo;
 import com.training_system.repo.PaymentRepo;
 import com.training_system.repo.PersonRepo;
+import com.training_system.resource.ResourceHandler;
 
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
-import java.nio.file.Files;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -102,11 +100,11 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		Person student = personRepo.findById(student_id).get();
 		Lesson lesson = lessonRepo.findById(lesson_id).get();
 		
-		// Load file as a resource
-        Resource resource = new ClassPathResource(lesson.getFilePath());
-        // Determine the file's media type
-        String contentType = Files.probeContentType(resource.getFile().toPath());
-        
+		// Load Resource Data (Resource, ContentType)
+		ResourceHandler resourceData = new ResourceHandler();
+		resourceData.loadResourceData(lesson.getFilePath());
+		Resource resource = resourceData.getResource();
+		String contentType = resourceData.getContentType();
         // Fallback to application/octet-stream if type is unknown
         if (contentType == null) {
             contentType = "application/octet-stream";
@@ -123,3 +121,4 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
                 .body(resource); //return resource file MP4, PNG, TXT, PDF
 	}
 }
+
