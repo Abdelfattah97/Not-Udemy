@@ -1,0 +1,32 @@
+<html>
+<body>
+<form action='/api/payment/course/charge' method='POST' id='checkout-form'>
+<div style="display:flex; justify-content: center; margin-top:100px;">
+			<div>
+				<input type='hidden' th:value='${amount}' name='amount' />
+				<div>
+				<h4>Course Purchase:</h4>
+					<h3 th:text="${course.title}"></h3>
+					<img style="border:1px solid gray;" alt="" src="https://artoftesting.com/wp-content/uploads/2020/03/introduction-to-java-featured.jpg">
+				</div>
+				<div style="margin-top:20px; margin-bottom:20px; font-weight: bold;">				
+				<label >Price: <span style="color:blue;"><span th:text="${amount/100}" /><span> $</span></span></label> <br> 
+				</div>
+				<input type="hidden" , th:value=${course.id} name="course_id"> 
+				<input type="hidden" , th:value=${person.id} name="person_id">
+				<!-- NOTE: data-key/data-amount/data-currency will be rendered by Thymeleaf -->
+				<script src='https://checkout.stripe.com/checkout.js'
+					class='stripe-button'
+					th:attr='data-key=${stripePublicKey}, 
+         data-amount=${amount},
+         data-currency=${currency}'
+					data-name='E-Learning System'
+					data-description='Java course checkout'
+					data-image='https://static.vecteezy.com/system/resources/previews/001/500/409/non_2x/e-learning-icon-free-vector.jpg'
+					data-locale='auto' data-zip-code='false'>
+   </script>
+			</div>
+		</div>
+</form>
+</body>
+</html>

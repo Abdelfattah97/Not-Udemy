@@ -3,6 +3,7 @@ package com.training_system.entity;
 import java.util.Set;
 
 import com.training_system.base.BaseEntity;
+import com.training_system.base.Product;
 import com.training_system.converter.CourseStatusConverter;
 import com.training_system.entity.enums.CourseStatus;
 
@@ -23,7 +24,7 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class Course  extends BaseEntity<Long> {
+public class Course  extends BaseEntity<Long> implements Product{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +36,11 @@ public class Course  extends BaseEntity<Long> {
 	@Convert(converter = CourseStatusConverter.class)
 	private CourseStatus status;
 	
+	/**
+	 * Price in cents which means divided by 100
+	 */
 	@Column(nullable = false)
-	private Double price;
+	private Integer price;
 	
 	@ManyToOne
 	@JoinColumn(name="instructor_id",nullable = false)

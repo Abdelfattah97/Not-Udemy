@@ -2,7 +2,7 @@ package com.training_system.payment.test;
 
 public enum PaymentStatus {
 
-	PENDING(1), DECLINED(2), APPROVED(3);
+	PENDING(1), FAILED(2), APPROVED(3);
 
 	private PaymentStatus(int value) {
 		this.value = value;

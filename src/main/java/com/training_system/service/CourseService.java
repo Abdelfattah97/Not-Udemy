@@ -6,8 +6,12 @@ import org.springframework.stereotype.Service;
 import com.training_system.base.BaseServiceImpl;
 import com.training_system.entity.Course;
 import com.training_system.entity.Lesson;
+import com.training_system.entity.Person;
+import com.training_system.exceptions.UnAuthorizedException;
 import com.training_system.repo.CourseRepo;
 import com.training_system.repo.PersonRepo;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class CourseService extends BaseServiceImpl<Course, Long> {
@@ -44,30 +48,30 @@ public class CourseService extends BaseServiceImpl<Course, Long> {
 	
 	@Override
 	public Course insert(Course course) {
-//		insertionCheck(course);
-//		
-//		Person instructor = course.getInstructor();
-//		
-//		if (instructor == null || instructor.getId() == null)
-//			throw new IllegalArgumentException("Instructor id is needed when creating a course");
-//
-//		Long instructor_id = instructor.getId();
-//		
-//		instructor = personRepo.findById(instructor.getId())
-//				.orElseThrow(
-//				() ->new EntityNotFoundException(
-//						String.format("No Instructor Found with id: %s", instructor_id)
-//						));
-//
-//		if (!userService.isInstructor(instructor.getUser()))
-//			throw new UnAuthorizedException("User doesn't have a role of an instructor to create courses");
-//
-//		
-//		course.setInstructor(instructor);
-//
-//		return super.insert(course);
+		insertionCheck(course);
 		
-		return null;//placeholder
+		Person instructor = course.getInstructor();
+		
+		if (instructor == null || instructor.getId() == null)
+			throw new IllegalArgumentException("Instructor id is needed when creating a course");
+
+		Long instructor_id = instructor.getId();
+		
+		instructor = personRepo.findById(instructor.getId())
+				.orElseThrow(
+				() ->new EntityNotFoundException(
+						String.format("No Instructor Found with id: %s", instructor_id)
+						));
+
+		if (!userService.isInstructor(instructor.getUser()))
+			throw new UnAuthorizedException("User doesn't have a role of an instructor to create courses");
+
+		
+		course.setInstructor(instructor);
+
+		return super.insert(course);
+		
+//		return null;//placeholder
 	}
 
 }

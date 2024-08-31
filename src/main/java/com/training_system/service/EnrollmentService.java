@@ -48,7 +48,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	@Autowired
 	private LessonRepo lessonRepo;
 	
-	public void enroll(Person student, Course course, Payment payment, LocalDate enrollmentDate, EnrollmentStatus enrollment_status) {
+	public Enrollment enroll(Person student, Course course, Payment payment, LocalDate enrollmentDate, EnrollmentStatus enrollment_status) {
 		Long student_id = student.getId();
 		Long course_id = course.getId();
 		Long payment_id = payment.getId();
@@ -67,7 +67,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		}
 		Enrollment enrollment = new Enrollment(student, course, payment, enrollmentDate, enrollment_status);
 		
-		enrollmentRepo.save(enrollment);
+		return enrollmentRepo.save(enrollment);
 	}
 	
 	@Transactional

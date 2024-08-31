@@ -11,5 +11,6 @@ import com.training_system.entity.User;
 public interface UserRepo extends BaseRepository<User,Long>{
 
   Optional<User> findByUsernameOrEmail(String username, String email);
+  Optional<User> findByUsername(String username);
 
 }
