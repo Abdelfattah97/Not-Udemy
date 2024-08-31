@@ -1,4 +1,4 @@
-package com.training_system.resource;
+package com.training_system.utils;
 
 import java.io.IOException;
 import java.net.URLConnection;

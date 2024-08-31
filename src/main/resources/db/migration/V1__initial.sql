@@ -1,14 +1,7 @@
 CREATE TABLE public.role
 (
-    id bigint NOT NULL,
+    id serial NOT NULL,
     name character varying(20) NOT NULL,
-    PRIMARY KEY (id)
-);
-
-CREATE TABLE public.course_status
-(
-    id bigint NOT NULL,
-    status_name character varying(20) NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -56,34 +49,24 @@ CREATE TABLE public.course
 (
     id serial NOT NULL,
     title character varying(100) NOT NULL,
-    status_id bigint NOT NULL,
+    status integer NOT NULL,
     price double precision NOT NULL DEFAULT 0,
     instructor_id bigint NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT course_status_id_fk FOREIGN KEY (status_id)
-        REFERENCES public.course_status (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID,
     CONSTRAINT course_instructor_identity_fk FOREIGN KEY (instructor_id)
 	    REFERENCES public.person (id) MATCH SIMPLE
 	    ON UPDATE NO ACTION
 	    ON DELETE NO ACTION
 	    NOT VALID
 );
-CREATE TABLE public.payment_method
-(
-id serial primary key,
-name varchar(50) not null unique
-);
 
 CREATE TABLE public.payment
 (
 id serial PRIMARY KEY ,
-pay_method_id bigint not null ,
+pay_method integer  not null ,
 pay_amount double precision not null,
-CONSTRAINT payment_method_fk FOREIGN KEY(pay_method_id)
-REFERENCES public.payment_method(id)
+product_type int not null,
+transaction_id varchar(250)not null
 );
 
 CREATE TABLE public.course_student
@@ -140,4 +123,3 @@ CREATE TABLE public.attendance
         NOT VALID
 );
 
-insert into course_status values(1,'public');

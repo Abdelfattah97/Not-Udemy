@@ -19,7 +19,7 @@ import com.training_system.repo.EnrollmentRepo;
 import com.training_system.repo.LessonRepo;
 import com.training_system.repo.PaymentRepo;
 import com.training_system.repo.PersonRepo;
-import com.training_system.resource.ResourceHandler;
+import com.training_system.utils.ResourceHandler;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

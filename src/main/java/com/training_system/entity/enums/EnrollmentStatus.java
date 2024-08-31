@@ -20,7 +20,7 @@ public enum EnrollmentStatus {
 				return type;
 			}
 		}
-		throw new IllegalArgumentException(String.format("No UserType with value: %d", value));
+		throw new IllegalArgumentException(String.format("No Enrollment Status with value: %d", value));
 	}
 
 }

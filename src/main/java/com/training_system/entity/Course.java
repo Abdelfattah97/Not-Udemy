@@ -3,8 +3,11 @@ package com.training_system.entity;
 import java.util.Set;
 
 import com.training_system.base.BaseEntity;
+import com.training_system.converter.CourseStatusConverter;
+import com.training_system.entity.enums.CourseStatus;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,8 +32,7 @@ public class Course  extends BaseEntity<Long> {
 	@Column(nullable = false)
 	private String title;
 	
-	@ManyToOne
-	@JoinColumn(name = "status_id")
+	@Convert(converter = CourseStatusConverter.class)
 	private CourseStatus status;
 	
 	@Column(nullable = false)
