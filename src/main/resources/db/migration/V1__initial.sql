@@ -123,3 +123,34 @@ CREATE TABLE public.attendance
         NOT VALID
 );
 
+
+CREATE TABLE public.quiz
+(
+    id serial NOT NULL,
+    quiz_name character varying(100) NOT NULL,
+    course_id bigint NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT course_quiz_id_fk FOREIGN KEY (course_id)
+        REFERENCES public.course (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
+
+CREATE TABLE public.question
+(
+    id serial NOT NULL,
+    quiz_id bigint NOT NULL,
+    content TEXT NOT NULL,
+    answer_a TEXT NOT NULL,
+    answer_b TEXT NOT NULL,
+    answer_c TEXT NOT NULL,
+    answer_d TEXT,
+    correct_answer character(1) NOT NULL,
+    PRIMARY KEY (id),
+    CONSTRAINT quiz_id_fk FOREIGN KEY (quiz_id)
+        REFERENCES public.quiz (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+        NOT VALID
+);
