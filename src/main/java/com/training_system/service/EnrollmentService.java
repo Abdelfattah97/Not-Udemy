@@ -48,6 +48,10 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	@Autowired
 	private LessonRepo lessonRepo;
 	
+	public Enrollment findByCourseStudent(Long course_id , Long person_id) {
+		return enrollmentRepo.findByCourse_IdAndStudent_Id(course_id,person_id).orElse(null);
+	}
+	
 	public Enrollment enroll(Person student, Course course, Payment payment, LocalDate enrollmentDate, EnrollmentStatus enrollment_status) {
 		Long student_id = student.getId();
 		Long course_id = course.getId();
