@@ -2,11 +2,13 @@ package com.training_system.entity;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.training_system.base.BaseEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -33,15 +35,16 @@ public class User extends BaseEntity<Long>  {
 	
 	@Column(nullable = false,unique = true)
 	private String username;
+	@JsonIgnore
 	@Column(nullable = false)
 	private String password;
 	@Column(nullable = false,unique = true)
 	private String email;
 	
-	@OneToOne(cascade = CascadeType.REMOVE)
+	@OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)
 	private Person person;
 	
-	@ManyToMany
+	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 			name="users_roles",
 			joinColumns = @JoinColumn(name="user_id"),
@@ -49,8 +52,8 @@ public class User extends BaseEntity<Long>  {
 			)
 	private Set<Role> roles;
 
-	public void addRole(Role role){
-		this.roles.add(role);
+	public void addRoles(Role... roles) {
+		this.roles = Set.of(roles);
 	}
 	
 }

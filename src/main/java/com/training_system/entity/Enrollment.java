@@ -3,6 +3,7 @@ package com.training_system.entity;
 import java.time.LocalDate;
 
 import com.training_system.base.BaseEntity;
+import com.training_system.entity.enums.EnrollmentStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,14 +12,24 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+//import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "course_student",
 uniqueConstraints = 
-	    @UniqueConstraint(columnNames = {"person_id", "course_id"})
+	    @UniqueConstraint(columnNames = {"student_id", "course_id"})
 )
-@Data
+//@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode
 public class Enrollment extends BaseEntity<Long> {
 
 	@ManyToOne
@@ -30,12 +41,13 @@ public class Enrollment extends BaseEntity<Long> {
 	private Course course;
 	
 	@OneToOne
-	@Column(nullable = false,unique = true)
+	@JoinColumn(name="pay_id",nullable = false,unique = true)
 	private Payment payment;
 	
 	@Column(name="enrollment_date")
 	private LocalDate enrollmentDate;
 	
-	private boolean isConfirmed;
+	@Column(name="enrollment_status")
+	private EnrollmentStatus enrollment_status;
 	
 }

@@ -1,6 +1,9 @@
 package com.training_system.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.training_system.base.BaseServiceImpl;
@@ -10,7 +13,7 @@ import com.training_system.repo.RoleRepo;
 import com.training_system.repo.UserRepo;
 
 @Service
-public class UserService extends BaseServiceImpl<User, Long> {
+public class UserService extends BaseServiceImpl<User, Long> implements UserDetailsService {
 
 	@Autowired
 	UserRepo userRepo;
@@ -31,6 +34,17 @@ public class UserService extends BaseServiceImpl<User, Long> {
 
 		return null;//placeholder
 		
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return userRepo.findByUsernameOrEmail(username, username)
+				.map(user -> org.springframework.security.core.userdetails.User.builder()
+						.username(user.getUsername())
+						.password(user.getPassword())
+						.authorities(user.getRoles())
+						.build())
+				.orElseThrow(() -> new UsernameNotFoundException("Invalid credentials"));
 	}
 
 }
