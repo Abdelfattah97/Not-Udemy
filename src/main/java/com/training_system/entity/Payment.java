@@ -14,6 +14,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.Builder;
 import lombok.Data;
@@ -49,7 +50,7 @@ public class Payment extends BaseEntity<Long> {
 	@Convert(converter =PaymentStatusConverter.class)
 	private PaymentStatus paymentStatus;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "buyer_id")
 	@JsonIncludeProperties(value = {"id","name"})
 	private Person buyer;
