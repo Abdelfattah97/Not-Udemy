@@ -15,11 +15,13 @@ import com.stripe.exception.AuthenticationException;
 import com.stripe.exception.CardException;
 import com.stripe.exception.InvalidRequestException;
 import com.stripe.model.Charge;
+import com.stripe.model.Refund;
 import com.training_system.entity.Payment;
 import com.training_system.entity.dto.PaymentRequest;
 import com.training_system.entity.enums.PaymentMethod;
 import com.training_system.entity.enums.PaymentStatus;
 import com.training_system.exceptions.PaymentFailureException;
+import com.training_system.exceptions.RefundFailureException;
 
 import jakarta.annotation.PostConstruct;
 
@@ -27,16 +29,15 @@ import jakarta.annotation.PostConstruct;
 public final class StripePaymentProviderImpl implements PaymentProvider {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	
 
-    @Value("${STRIPE_SECRET_KEY}")
-    private String secretKey;
-	
-	  @PostConstruct
-	    public void init() {
-	        Stripe.apiKey = secretKey;
-	    }
-	
+	@Value("${STRIPE_SECRET_KEY}")
+	private String secretKey;
+
+	@PostConstruct
+	public void init() {
+		Stripe.apiKey = secretKey;
+	}
+
 	@Override
 	public Payment pay(PaymentRequest chargeRequest) {
 		// Charge Response
@@ -45,10 +46,10 @@ public final class StripePaymentProviderImpl implements PaymentProvider {
 			charge = charge(chargeRequest);
 		} catch (RuntimeException | AuthenticationException | InvalidRequestException | APIConnectionException
 				| CardException | APIException e) {
-			logger.error("Payment Failed!",e);
+			logger.error("Payment Failed!", e);
 			throw new PaymentFailureException(e.getMessage());
 		}
-		
+
 		// Payment Initialization
 		Payment payment = Payment.builder().buyer(chargeRequest.getPerson()).productType(chargeRequest.getProductType())
 				.payAmount(chargeRequest.getAmount()).currency(chargeRequest.getCurrency())
@@ -57,10 +58,40 @@ public final class StripePaymentProviderImpl implements PaymentProvider {
 		return payment;
 	}
 
+	@Override
+	public Payment refund(Payment payment) {
+
+		// Retrieve Previous Charge
+		Charge charge = null;
+		try {
+			charge = Charge.retrieve(payment.getTransactionId());
+		} catch (AuthenticationException | InvalidRequestException | APIConnectionException | CardException
+				| APIException e) {
+			logger.error(e.getMessage(), e);
+			throw new RefundFailureException(
+					String.format("Can't Retrieve previous charge(%s)", payment.getTransactionId()));
+		}
+
+		// Make a Refund
+		Refund refund = null;
+		try {
+			refund = refund(charge);
+		} catch (AuthenticationException | InvalidRequestException | APIConnectionException | CardException
+				| APIException e) {
+			logger.error(e.getMessage(), e);
+			throw new RefundFailureException(e.getMessage());
+		}
+
+		// Payment Object Update
+		payment.setPaymentStatus(PaymentStatus.REFUNDED);
+		return payment;
+
+	}
+
 	private PaymentStatus getPaymentStatus(String status) {
 		switch (status) {
 		case "succeeded":
-			return PaymentStatus.APPROVED;
+			return PaymentStatus.REFUNDABLE;
 		case "pending":
 			return PaymentStatus.PENDING;
 		case "failed":
@@ -70,7 +101,7 @@ public final class StripePaymentProviderImpl implements PaymentProvider {
 		}
 	}
 
-	public Charge charge(PaymentRequest chargeRequest) throws AuthenticationException, InvalidRequestException,
+	private Charge charge(PaymentRequest chargeRequest) throws AuthenticationException, InvalidRequestException,
 			APIConnectionException, CardException, APIException {
 		Map<String, Object> chargeParams = new HashMap<>();
 		chargeParams.put("amount", chargeRequest.getAmount());
@@ -78,6 +109,15 @@ public final class StripePaymentProviderImpl implements PaymentProvider {
 		chargeParams.put("description", chargeRequest.getDescription());
 		chargeParams.put("source", chargeRequest.getProviderKey());
 		return Charge.create(chargeParams);
+	}
+
+	private Refund refund(Charge charge) throws AuthenticationException, InvalidRequestException,
+			APIConnectionException, CardException, APIException {
+		Map<String, Object> refundParams = new HashMap<String, Object>();
+		refundParams.put("amount", charge.getAmount());
+		refundParams.put("charge", charge.getId());
+
+		return Refund.create(refundParams);
 	}
 
 }

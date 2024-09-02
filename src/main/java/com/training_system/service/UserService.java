@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.training_system.base.BaseServiceImpl;
@@ -19,6 +20,9 @@ public class UserService extends BaseServiceImpl<User, Long> implements UserDeta
 
 	@Autowired
 	UserRepo userRepo;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	RoleRepo roleRepo;
@@ -34,8 +38,17 @@ public class UserService extends BaseServiceImpl<User, Long> implements UserDeta
 
 	public User addRole(Long user_id, Long role_id) {
 
-		return null;// placeholder
-
+		User user = findById(user_id);
+		Role role = roleService.findById(role_id);
+		
+		user.addRoles(role);
+		return super.update(user);
+	}
+	
+	@Override
+	public User insert(User entity) {
+		entity.setPassword(passwordEncoder.encode(entity.getPassword()));
+		return super.insert(entity);
 	}
 
 	@Override

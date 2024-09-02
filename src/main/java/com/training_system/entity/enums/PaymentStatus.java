@@ -2,7 +2,7 @@ package com.training_system.entity.enums;
 
 public enum PaymentStatus {
 
-	PENDING(1), FAILED(2), APPROVED(3);
+	PENDING(1), FAILED(2), REFUNDABLE(4), UNREFUNDABLE(5), REFUNDED(6);
 
 	private PaymentStatus(int value) {
 		this.value = value;

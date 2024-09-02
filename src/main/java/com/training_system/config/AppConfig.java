@@ -75,12 +75,30 @@ public class AppConfig implements CommandLineRunner {
 		master.setPassword(passwordEncoder.encode("password"));
 		master.addRoles(studentRole, instructorRole);
 		userRepo.save(master);
-		insertInstructorAndCourse();
+		insertInstructorAndCourse(instructor);
+		insertStudent(student);
 	}
 
-	void insertInstructorAndCourse() {
+	void insertStudent(User user) {
+		Country egypt = countryRepo.findByCountryName("Egypt").orElseGet(() -> {
+			Country country = new Country();
+			country.setCountryName("Egypt");
+			return countryRepo.save(country);
+		});
 
-		Country egypt = countryRepo.findByCountryName("egypt").orElseGet(() -> {
+		Person student = personRepo.findByName("A Student").orElseGet(() -> {
+			Person person = new Person();
+			person.setUser(user);
+			person.setCountry(egypt);
+			person.setName("A Student");
+			return personRepo.save(person);
+		});
+
+	}
+
+	void insertInstructorAndCourse(User user) {
+
+		Country egypt = countryRepo.findByCountryName("Egypt").orElseGet(() -> {
 			Country country = new Country();
 			country.setCountryName("Egypt");
 			return countryRepo.save(country);
@@ -88,7 +106,7 @@ public class AppConfig implements CommandLineRunner {
 
 		Person instructor = personRepo.findByName("MR PROf").orElseGet(() -> {
 			Person person = new Person();
-			person.setUser(userRepo.findByUsernameOrEmail("instructor", null).orElse(null));
+			person.setUser(user);
 			person.setCountry(egypt);
 			person.setName("MR PROf");
 			return personRepo.save(person);

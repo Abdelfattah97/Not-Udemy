@@ -51,6 +51,11 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	public Enrollment findByCourseStudent(Long course_id , Long person_id) {
 		return enrollmentRepo.findByCourse_IdAndStudent_Id(course_id,person_id).orElse(null);
 	}
+	public Enrollment findByPayment(Payment payment) {
+		return enrollmentRepo.findByPayment(payment).orElseThrow(()->
+		 new EntityNotFoundException(String.format("No Enrollment Found for payment of id: ",payment.getBuyer().getId()))
+		);
+	}
 	
 	public Enrollment enroll(Person student, Course course, Payment payment, LocalDate enrollmentDate, EnrollmentStatus enrollment_status) {
 		Long student_id = student.getId();

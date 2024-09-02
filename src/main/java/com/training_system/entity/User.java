@@ -1,6 +1,8 @@
 package com.training_system.entity;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.training_system.base.BaseEntity;
@@ -35,7 +37,7 @@ public class User extends BaseEntity<Long>  {
 	
 	@Column(nullable = false,unique = true)
 	private String username;
-	@JsonIgnore
+//	@JsonIgnore
 	@Column(nullable = false)
 	private String password;
 	@Column(nullable = false,unique = true)
@@ -50,10 +52,10 @@ public class User extends BaseEntity<Long>  {
 			joinColumns = @JoinColumn(name="user_id"),
 			inverseJoinColumns = @JoinColumn(name="role_id")
 			)
-	private Set<Role> roles;
+	private Set<Role> roles = new HashSet<>();
 
 	public void addRoles(Role... roles) {
-		this.roles = Set.of(roles);
+		this.roles.addAll(Set.of(roles));
 	}
 	
 }
