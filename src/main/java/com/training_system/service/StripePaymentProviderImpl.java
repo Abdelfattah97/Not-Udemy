@@ -32,6 +32,9 @@ public final class StripePaymentProviderImpl implements PaymentProvider {
 
 	@Value("${STRIPE_SECRET_KEY}")
 	private String secretKey;
+	
+	@Value("${STRIPE_REFUNDABLE_RATIO}")
+	private Double refundableRatio;
 
 	@PostConstruct
 	public void init() {
@@ -114,10 +117,16 @@ public final class StripePaymentProviderImpl implements PaymentProvider {
 	private Refund refund(Charge charge) throws AuthenticationException, InvalidRequestException,
 			APIConnectionException, CardException, APIException {
 		Map<String, Object> refundParams = new HashMap<String, Object>();
-		refundParams.put("amount", charge.getAmount());
+		refundParams.put("amount", calculateRefundFees(charge.getAmount()));
 		refundParams.put("charge", charge.getId());
 
 		return Refund.create(refundParams);
+	}
+	
+	private Integer calculateRefundFees(Long amount) {
+		
+		return (int) Math.ceil(amount*refundableRatio);
+		
 	}
 
 }
