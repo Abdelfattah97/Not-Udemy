@@ -1,5 +1,11 @@
 package com.training_system.entity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import com.fasterxml.jackson.annotation.JsonIncludeProperties;
 import com.training_system.base.BaseEntity;
 import com.training_system.converter.CurrencyConverter;
@@ -14,6 +20,7 @@ import com.training_system.entity.enums.ProductType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -31,6 +38,7 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class Payment extends BaseEntity<Long> {
 
 	@Convert(converter = PaymentMethodConverter.class)
@@ -51,6 +59,8 @@ public class Payment extends BaseEntity<Long> {
 	
 	private String transactionId;
 	
+	@CreatedDate
+	private LocalDateTime createdDate;
 	
 	@Convert(converter =PaymentStatusConverter.class)
 	private PaymentStatus paymentStatus;

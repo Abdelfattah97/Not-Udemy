@@ -51,53 +51,74 @@ public class AppConfig implements CommandLineRunner {
 			role.setName("student");
 			return roleRepo.save(role);
 		});
+		
+		Role admineRole = roleRepo.findByName("master").orElseGet(() -> {
+			Role role = new Role();
+			role.setName("master");
+			return roleRepo.save(role);
+		});
 
-		User student = new User();
-		student.setId(1L);
-		student.setUsername("student");
-		student.setEmail("student@gmail.com");
-		student.setPassword(passwordEncoder.encode("password"));
-		student.addRoles(studentRole);
-		userRepo.save(student);
+		User student = userRepo.findByUsername("student").orElseGet(() -> {
+			logger.warn("This is student supplier!");
+			User std = new User();
+			std.setUsername("student");
+			std.setEmail("student@gmail.com");
+			std.setPassword(passwordEncoder.encode("password"));
+			std.addRoles(studentRole);
+			return userRepo.save(std);
+		});
 
-		User instructor = new User();
-		instructor.setId(2L);
-		instructor.setUsername("instructor");
-		instructor.setEmail("instructor@gmail.com");
-		instructor.setPassword(passwordEncoder.encode("password"));
-		instructor.addRoles(instructorRole);
-		userRepo.save(instructor);
+		User student2 = userRepo.findByUsername("student2").orElseGet(() -> {
+			logger.warn("This is student2 supplier!");
+			User std2 = new User();
+			std2.setUsername("student2");
+			std2.setEmail("student2@gmail.com");
+			std2.setPassword(passwordEncoder.encode("password"));
+			std2.addRoles(studentRole);
+			return userRepo.save(std2);
+		});
 
-		User master = new User();
-		master.setId(3L);
-		master.setUsername("master");
-		master.setEmail("master@gmail.com");
-		master.setPassword(passwordEncoder.encode("password"));
-		master.addRoles(studentRole, instructorRole);
-		userRepo.save(master);
+		User instructor = userRepo.findByUsername("instructor").orElseGet(() -> {
+			User inst = new User();
+			inst.setUsername("instructor");
+			inst.setEmail("instructor@gmail.com");
+			inst.setPassword(passwordEncoder.encode("password"));
+			inst.addRoles(instructorRole);
+			return userRepo.save(inst);
+		});
+
+		User master = userRepo.findByUsername("master").orElseGet(() -> {
+			User mstr = new User();
+			mstr.setUsername("master");
+			mstr.setEmail("master@gmail.com");
+			mstr.setPassword(passwordEncoder.encode("password"));
+			mstr.addRoles(admineRole);
+			return userRepo.save(mstr);
+		});
+
 		insertInstructorAndCourse(instructor);
-		insertStudent(student);
+		insertStudent(student, "Student 1");
+		insertStudent(student2, "Student 2");
 	}
 
-	void insertStudent(User user) {
+	void insertStudent(User user, String studentName) {
 		Country egypt = countryRepo.findByCountryName("Egypt").orElseGet(() -> {
 			Country country = new Country();
 			country.setCountryName("Egypt");
 			return countryRepo.save(country);
 		});
 
-		Person student = personRepo.findByName("A Student").orElseGet(() -> {
+		Person student = personRepo.findByName(studentName).orElseGet(() -> {
 			Person person = new Person();
 			person.setUser(user);
 			person.setCountry(egypt);
-			person.setName("A Student");
+			person.setName(studentName);
 			return personRepo.save(person);
 		});
 
 	}
 
 	void insertInstructorAndCourse(User user) {
-
 		Country egypt = countryRepo.findByCountryName("Egypt").orElseGet(() -> {
 			Country country = new Country();
 			country.setCountryName("Egypt");
@@ -111,26 +132,18 @@ public class AppConfig implements CommandLineRunner {
 			person.setName("MR PROf");
 			return personRepo.save(person);
 		});
-
 		insertCourse(instructor);
-
 	}
 
 	void insertCourse(Person instructor) {
-		logger.warn("insertCourse Method start:");
 		if (courseService.findAll().isEmpty()) {
-			logger.warn("empty courses table , will insert new one!");
 			Course course = new Course();
 			course.setInstructor(instructor);
 			course.setTitle("JAVA INTRODUCTION");
 			course.setPrice(10000);
 			course.setStatus(CourseStatus.PUBLIC);
 			course = courseService.insert(course);
-			logger.warn(course.getTitle());
-		} else {
-			logger.warn("Found Courses in DB");
 		}
-
 	}
 
 }
