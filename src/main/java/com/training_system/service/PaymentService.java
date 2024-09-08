@@ -61,14 +61,11 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 
 	public List<Payment> findAll(UserDetails userDetails) {
 		String username = userDetails.getUsername();
-		logger.warn("UserName Intiallized from user details");
 		User user = userService.findByUserName(username);
-		logger.warn("retrieved user through user service");
 		boolean isAdmin = user.getRoles().stream()
 				.filter(role -> role.getName().equalsIgnoreCase("master"))
 				.findAny()
 				.isPresent();		
-		logger.warn("Determined if user is Admin: "+isAdmin);
 		if (isAdmin) {
 			return findAll();
 		} else {
