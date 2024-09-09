@@ -1,11 +1,13 @@
 package com.training_system.service;
 
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.training_system.base.BaseServiceImpl;
+import com.training_system.entity.Lesson;
 import com.training_system.entity.Question;
-import com.training_system.entity.Quiz;
 import com.training_system.repo.QuestionRepo;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -16,7 +18,11 @@ public class QuestionService extends BaseServiceImpl<Question, Long> {
 	@Autowired
 	private QuestionRepo questionRepo;
 	
-	public Question addQuestion(Quiz quiz, String content, String answerA, String answerB, String answerC, String answerD, Character correctAnswer) {
+	public Set<Question> getQuizQuestions(Long quiz_id){
+		return questionRepo.findByQuiz_Id(quiz_id);
+	}
+	
+	public Question addQuestion(Lesson quiz, String content, String answerA, String answerB, String answerC, String answerD, Character correctAnswer) {
 		Question question = new Question(quiz, content, answerA, answerB, answerC, answerD, correctAnswer);
 		return questionRepo.save(question);
 	}
@@ -27,7 +33,7 @@ public class QuestionService extends BaseServiceImpl<Question, Long> {
 	}
 	
 	@Transactional
-	public Question updateQuestion(Question question, Quiz quiz, String content, String answerA, String answerB, String answerC, String answerD, Character correctAnswer) {
+	public Question updateQuestion(Question question, Lesson quiz, String content, String answerA, String answerB, String answerC, String answerD, Character correctAnswer) {
 		question.setQuiz(quiz);
 		question.setAnswerD(content);
 		question.setAnswerA(answerA);

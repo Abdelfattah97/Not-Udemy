@@ -97,6 +97,7 @@ CREATE TABLE public.lesson
     course_id bigint NOT NULL,
     title character varying(150) NOT NULL,
     file_path TEXT NOT NULL,
+    content_type integer NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT crs_id_fk FOREIGN KEY (course_id)
         REFERENCES public.course (id) MATCH SIMPLE
@@ -124,18 +125,18 @@ CREATE TABLE public.attendance
 );
 
 
-CREATE TABLE public.quiz
-(
-    id serial NOT NULL,
-    quiz_name character varying(100) NOT NULL,
-    course_id bigint NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT course_quiz_id_fk FOREIGN KEY (course_id)
-        REFERENCES public.course (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
-        NOT VALID
-);
+--CREATE TABLE public.quiz
+--(
+--    id serial NOT NULL,
+--    quiz_name character varying(100) NOT NULL,
+--    course_id bigint NOT NULL,
+--    PRIMARY KEY (id),
+--    CONSTRAINT course_quiz_id_fk FOREIGN KEY (course_id)
+--        REFERENCES public.course (id) MATCH SIMPLE
+--        ON UPDATE NO ACTION
+--        ON DELETE NO ACTION
+--        NOT VALID
+--);
 
 CREATE TABLE public.question
 (
@@ -149,7 +150,7 @@ CREATE TABLE public.question
     correct_answer character(1) NOT NULL,
     PRIMARY KEY (id),
     CONSTRAINT quiz_id_fk FOREIGN KEY (quiz_id)
-        REFERENCES public.quiz (id) MATCH SIMPLE
+        REFERENCES public.lesson (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID

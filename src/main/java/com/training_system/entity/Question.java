@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class Question extends BaseEntity<Long>{
 	@ManyToOne
 	@JoinColumn(name="quiz_id",nullable = false)
-	private Quiz quiz;
+	private Lesson quiz;
 	
 	@Column(name="content",nullable = false)
 	private String content;
