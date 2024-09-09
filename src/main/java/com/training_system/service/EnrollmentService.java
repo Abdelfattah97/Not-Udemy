@@ -189,13 +189,9 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		
 		return enrollmentRepo.findAll().stream()
 			    .filter(enrollment -> enrollment.getStudent().getId().equals(student.getId()))
-			    .map(enrollment -> lessonRepo.findByCourse_IdAndStudent_Id(
-			    		enrollment.getCourse().getId(), 
-			    		enrollment.getStudent().getId()
-			    		).orElse(null)
-		    		)
-			    .filter(Objects::nonNull) // Filter out null values
-			    .collect(Collectors.toSet());		
+			    .flatMap(enrollment -> lessonRepo.findByCourse_Id(enrollment.getCourse().getId()).stream())
+			    .filter(Objects::nonNull) // Filter out null values if any
+			    .collect(Collectors.toSet());
 	}
 }
 
