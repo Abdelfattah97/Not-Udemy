@@ -51,7 +51,7 @@ public class PaymentController {
 
 		ChargeRequest chargeRequest = ChargeRequest.builder().person(person).product(course)
 				.description("Course Purchase").amount(amountCents).currency(Currency.USD).stripeEmail(stripeEmail)
-				.stripeToken(stripeToken).productType(ProductType.COURSE_ENROLLMENT_PAYMENT).build();
+				.stripeToken(stripeToken).productType(ProductType.COURSE_ENROLLMENT).build();
 
 		return paymentService.payCourse(chargeRequest);
 

@@ -2,7 +2,7 @@ package com.training_system.entity.enums;
 
 public enum ProductType {
 
-	COURSE_ENROLLMENT_PAYMENT(1),SUBSCRIPTION_PAYMENT(2);
+	COURSE_ENROLLMENT(1),SUBSCRIPTION(2);
 	
 	private ProductType(int value){
 		this.value = value;

@@ -22,6 +22,7 @@ import com.training_system.repo.PersonRepo;
 import com.training_system.utils.ResourceHandler;
 
 import org.springframework.core.io.Resource;
+import org.springframework.data.convert.Jsr310Converters.LocalDateTimeToDateConverter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +58,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		);
 	}
 	
-	public Enrollment enroll(Person student, Course course, Payment payment, LocalDate enrollmentDate, EnrollmentStatus enrollment_status) {
+	public Enrollment enroll(Person student, Course course, Payment payment) {
 		Long student_id = student.getId();
 		Long course_id = course.getId();
 		Long payment_id = payment.getId();
@@ -71,10 +72,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		if(paymentRepo.findById(payment_id).isEmpty()) {
 			throw new EntityNotFoundException("Payment with id = " + payment_id + " is Not Found!!!");
 		}
-		if(enrollment_status.getValue() > 4 || enrollment_status.getValue() < 1) {
-			throw new UnknownStatusException("Found unknown enrollment status!!!");
-		}
-		Enrollment enrollment = new Enrollment(student, course, payment, enrollmentDate, enrollment_status);
+		Enrollment enrollment = new Enrollment(student, course, payment, LocalDate.now(), EnrollmentStatus.REFUNDABLE);
 		
 		return enrollmentRepo.save(enrollment);
 	}
@@ -128,6 +126,9 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource); //return resource file MP4, PNG, TXT, PDF
+	}
+	public void confrimEnrollment(Enrollment enrollment) {
+		
 	}
 }
 

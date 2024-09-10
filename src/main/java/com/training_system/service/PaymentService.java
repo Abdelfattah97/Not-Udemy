@@ -32,6 +32,7 @@ import com.training_system.repo.EnrollmentRepo;
 import com.training_system.repo.PaymentRepo;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PaymentService extends BaseServiceImpl<Payment, Long> {
@@ -97,6 +98,7 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	
 	// Payments Related
 	@PreAuthorize("hasAuthority('master') or @paymentService.isUserOwnerOfPayment(#paymentRequest,principal.username)")
+	@Transactional
 	public Enrollment payCourse(PaymentRequest paymentRequest) {
 		
 		// Ensures no previous Enrollments preventing Duplicate Enrollments and Payments
@@ -118,30 +120,24 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 		Course course = new Course();
 		course.setId(paymentRequest.getProduct().getId());
 
-		return enrollmentService.enroll(paymentRequest.getPerson(), course, payment, LocalDate.now(),
-				determineEnrollmentStatus(payment.getPaymentStatus()));
+		return enrollmentService.enroll(paymentRequest.getPerson(), course, payment);
 
 	}
 
-	EnrollmentStatus determineEnrollmentStatus(PaymentStatus paymentStatus) {
-		switch (paymentStatus) {
-
-		case REFUNDABLE: {
-			return EnrollmentStatus.REFUNDABLE;
-		}
-		case FAILED: {
-			return EnrollmentStatus.FAILED_PAYMENT;
-		}
-		case PENDING: {
-			return EnrollmentStatus.PENDING_PAYMENT;
-		}
-		default:
-			throw new IllegalArgumentException("Unexpected PaymentStatus value: " + paymentStatus);
-		}
+	
+	/**
+	 * makes a payment unrefundable , and any further actions needed
+	 * @return the given payment with a 
+	 */
+	 Payment lockPayment(Payment payment) {
+		payment.setPaymentStatus(PaymentStatus.UNREFUNDABLE);
+		 return update(payment);
+		
 	}
-
+	
 	// Refunds Related
 	@PreAuthorize("hasAuthority('master') or @paymentService.isUserOwnerOfPayment(#payment_id,principal.username)")
+	@Transactional
 	public Payment refund(Long payment_id) {
 		Payment payment = findById(payment_id);
 		// Ensures Payment is refundable before proceeding to a refund request to the payment provider
@@ -166,7 +162,7 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 
 		switch (productType) {
 
-		case COURSE_ENROLLMENT_PAYMENT: {
+		case COURSE_ENROLLMENT: {
 			// Ensures the Enrollment Exists bef proceeding
 			Enrollment enrollment = enrollmentRepo.findByPayment(payment).orElseThrow(() -> new EntityNotFoundException(
 					String.format("No Enrollment found for payment of id: %s", payment.getId())));
@@ -190,26 +186,9 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 
 	}
 
-	public void limitExpiredRefundables() {
-		Set<Enrollment> enrollments = new HashSet<Enrollment>();
-		List<Payment> payments = paymentRepo.findAll().stream()
-				.filter(p -> isRefundable(p) && exceededRefundableDuration(p)).map(p -> {
-					logger.warn(String.format("Changed status of payment with id: %s ", p.getId()));
-					p.setPaymentStatus(PaymentStatus.UNREFUNDABLE);
-					Enrollment enrollment = enrollmentService.findByPayment(p);
-					enrollment.setEnrollment_status(determineEnrollmentStatus(p.getPaymentStatus()));
-					enrollments.add(enrollment);
-					return p;
-				}).toList();
-		paymentRepo.saveAllAndFlush(payments);
-		enrollmentRepo.saveAllAndFlush(enrollments);
-	}
-
-	private boolean exceededRefundableDuration(Payment payment) {
-		LocalDateTime creationDate = payment.getCreatedDate();
-		Duration paymentAge = Duration.between(creationDate, LocalDateTime.now());
-		Duration refundLimit = Duration.ofMinutes(1L);
-		return paymentAge.compareTo(refundLimit) > 0;
+	public Payment confirmPayment(Payment payment) {
+		payment.setPaymentStatus(PaymentStatus.UNREFUNDABLE);
+		return update(payment);
 	}
 
 }

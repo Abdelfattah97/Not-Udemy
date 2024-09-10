@@ -129,3 +129,12 @@ CREATE TABLE public.attendance
         NOT VALID
 );
 
+create table wallet (
+	id serial primary key,
+	transaction_amount INTEGER NOT NULL,
+	person_id BIGINT NOT NULL,
+	created_date TIMESTAMP NOT NULL,
+	CONSTRAINT person_wallet_fk FOREIGN KEY (person_id)
+    	REFERENCES public.person (id)
+);
+

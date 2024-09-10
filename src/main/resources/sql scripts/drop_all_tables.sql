@@ -15,4 +15,5 @@ drop table if exists payment_method cascade;
 drop table if exists users_roles cascade;
 drop table if exists person cascade;
 drop table if exists person_user_types cascade;
+drop table if exists wallet cascade;
 delete from public.flyway_schema_history;
