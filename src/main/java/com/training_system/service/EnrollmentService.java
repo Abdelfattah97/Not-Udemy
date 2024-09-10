@@ -60,8 +60,28 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	
 	@Autowired
 	private UserRepo userRepo;
+
+	private EnrollmentStatus determineEnrollmentStatus(PaymentStatus paymentStatus) {
+		switch (paymentStatus) {
+
+			case REFUNDABLE: {
+				return EnrollmentStatus.REFUNDABLE;
+			}
+			case FAILED: {
+				return EnrollmentStatus.FAILED_PAYMENT;
+			}
+			case PENDING: {
+				return EnrollmentStatus.PENDING_PAYMENT;
+			}
+			case UNREFUNDABLE:{
+				return EnrollmentStatus.CONFIRMED;
+			}
+			default:
+				throw new IllegalArgumentException("Unexpected PaymentStatus value: " + paymentStatus);
+		}
+	}
 	
-	public void enroll(Person student, Course course, Payment payment, LocalDate enrollmentDate, EnrollmentStatus enrollment_status) {
+	public void enroll(Person student, Course course, Payment payment) {
 		Long student_id = student.getId();
 		Long course_id = course.getId();
 		Long payment_id = payment.getId();
@@ -75,10 +95,9 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		if(paymentRepo.findById(payment_id).isEmpty()) {
 			throw new EntityNotFoundException("Payment with id = " + payment_id + " is Not Found!!!");
 		}
-		if(enrollment_status.getValue() > 4 || enrollment_status.getValue() < 1) {
-			throw new UnknownStatusException("Found unknown enrollment status!!!");
-		}
-		Enrollment enrollment = new Enrollment(student, course, payment, enrollmentDate, enrollment_status);
+
+		EnrollmentStatus enrollmentStatus = determineEnrollmentStatus(payment.getPaymentStatus());
+		Enrollment enrollment = new Enrollment(student, course, payment, LocalDate.now(), enrollmentStatus);
 		
 		enrollmentRepo.save(enrollment);
 	}
@@ -100,6 +119,8 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		enrollmentData.setEnrollment_status(enrollmentStatus);
 		enrollmentRepo.save(enrollmentData);
 	}
+//	@Transactional
+//	public void confirmEnrollments()
 	
 	@Transactional
 	public ResponseEntity<Resource> attendLesson(Long lesson_id, Long student_id) throws IOException {
@@ -187,11 +208,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 
 		Course course = courseRepo.findById(course_id).orElseThrow(() -> new EntityNotFoundException("There is no course with this id!!!"));
 		
-		return enrollmentRepo.findAll().stream()
-			    .filter(enrollment -> enrollment.getStudent().getId().equals(student.getId()))
-			    .flatMap(enrollment -> lessonRepo.findByCourse_Id(enrollment.getCourse().getId()).stream())
-			    .filter(Objects::nonNull) // Filter out null values if any
-			    .collect(Collectors.toSet());
+		return lessonRepo.findByCourse_IdAndCourse_Enrollments_Student_Id(course_id, student.getId());
 	}
 }
 
