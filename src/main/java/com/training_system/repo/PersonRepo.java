@@ -6,10 +6,12 @@ import org.springframework.stereotype.Repository;
 
 import com.training_system.base.BaseRepository;
 import com.training_system.entity.Person;
+import com.training_system.entity.Role;
 
 @Repository
 public interface PersonRepo extends BaseRepository<Person,Long>{
 
 	Optional<Person> findByUser_Id(Long user_id);
+	Optional<Person> findByName(String name);
 
 }

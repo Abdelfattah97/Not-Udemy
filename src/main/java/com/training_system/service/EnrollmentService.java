@@ -20,6 +20,7 @@ import com.training_system.entity.Question;
 import com.training_system.entity.User;
 import com.training_system.entity.enums.EnrollmentStatus;
 import com.training_system.entity.enums.LessonType;
+import com.training_system.entity.enums.PaymentStatus;
 import com.training_system.exceptions.UnknownStatusException;
 import com.training_system.repo.CourseRepo;
 import com.training_system.repo.EnrollmentRepo;
@@ -31,6 +32,7 @@ import com.training_system.utils.ResourceHandler;
 
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.convert.Jsr310Converters.LocalDateTimeToDateConverter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,6 +62,9 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	
 	@Autowired
 	private UserRepo userRepo;
+	
+	@Autowired
+	private ProductConfirmationFacade productConfirmationFacade;
 
 	private EnrollmentStatus determineEnrollmentStatus(PaymentStatus paymentStatus) {
 		switch (paymentStatus) {
@@ -80,8 +85,18 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 				throw new IllegalArgumentException("Unexpected PaymentStatus value: " + paymentStatus);
 		}
 	}
+
+	public Enrollment findByCourseStudent(Long course_id , Long person_id) {
+		return enrollmentRepo.findByCourse_IdAndStudent_Id(course_id,person_id).orElse(null);
+	}
+	public Enrollment findByPayment(Payment payment) {
+		return enrollmentRepo.findByPayment(payment).orElseThrow(()->
+		 new EntityNotFoundException(String.format("No Enrollment Found for payment of id: ",payment.getBuyer().getId()))
+		);
+	}
 	
-	public void enroll(Person student, Course course, Payment payment) {
+	public Enrollment enroll(Person student, Course course, Payment payment) {
+
 		Long student_id = student.getId();
 		Long course_id = course.getId();
 		Long payment_id = payment.getId();
@@ -99,7 +114,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		EnrollmentStatus enrollmentStatus = determineEnrollmentStatus(payment.getPaymentStatus());
 		Enrollment enrollment = new Enrollment(student, course, payment, LocalDate.now(), enrollmentStatus);
 		
-		enrollmentRepo.save(enrollment);
+		return enrollmentRepo.save(enrollment);
 	}
 	
 	@Transactional
@@ -133,6 +148,9 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		
 		Person student = personRepo.findById(student_id).get();
 		Lesson lesson = lessonRepo.findById(lesson_id).get();
+		Enrollment enrollment = enrollmentRepo.findByCourse_Lesson_IdAndStudent_Id(lesson_id, student_id).orElseThrow(() -> new EntityNotFoundException("There is no enrollment for this course_lesson and student"));
+		Payment payment = enrollment.getPayment();
+		
 		
 		
 		
@@ -147,7 +165,8 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	            contentType = "application/octet-stream";
 	        }
 	        if(!student.getAttendedLessons().contains(lesson)) { // The student has not attended before
-				student.addAttendedLesson(lesson);
+				productConfirmationFacade.confirmPayment(payment, null);
+	        	student.addAttendedLesson(lesson);
 				personRepo.save(student);
 			}
 	        return ResponseEntity.ok()
@@ -164,6 +183,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 			            .contentType(MediaType.TEXT_PLAIN)
 			            .body(resource);
 			}
+			productConfirmationFacade.confirmPayment(payment, null);
 			QuestionService qS = new QuestionService();
 			Set<Question> questions = qS.getQuizQuestions(lesson_id);
 			try {
@@ -209,6 +229,19 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		Course course = courseRepo.findById(course_id).orElseThrow(() -> new EntityNotFoundException("There is no course with this id!!!"));
 		
 		return lessonRepo.findByCourse_IdAndCourse_Enrollments_Student_Id(course_id, student.getId());
+	}
+	
+	public void confrimEnrollment(Payment payment) {
+		Enrollment enrollment = enrollmentRepo.findByPayment(payment).orElseThrow(() -> new EntityNotFoundException("There is no enrollment with this payment id!!!"));
+		
+		enrollment.setEnrollment_status(EnrollmentStatus.CONFIRMED);
+		enrollmentRepo.save(enrollment);
+	}
+	
+	public void cancelEnrollment(Payment payment) {
+		Enrollment enrollment = enrollmentRepo.findByPayment(payment).orElseThrow(() -> new EntityNotFoundException("There is no enrollment with this payment id!!!"));
+
+		enrollmentRepo.delete(enrollment);
 	}
 }
 

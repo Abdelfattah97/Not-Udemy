@@ -1,9 +1,10 @@
 package com.training_system.base;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -12,7 +13,7 @@ import jakarta.persistence.MappedSuperclass;
 @MappedSuperclass
 public class BaseServiceImpl<T extends BaseEntity<ID>,ID> implements BaseService<T, ID> {
 
-	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 	@Autowired
 	protected BaseRepository<T, ID> baseRepository;
 	
@@ -36,10 +37,11 @@ public class BaseServiceImpl<T extends BaseEntity<ID>,ID> implements BaseService
 	@Override
 	public T findById(ID id) {
 		return baseRepository.findById(id)
-				.orElseThrow(()->
-				  new EntityNotFoundException(
-						 String.format("No Entity found with the id: %s", id)));
-				
+				.orElseThrow(()->{
+					logger.error("Entity not found at: "+this.getClass());
+				 throw new EntityNotFoundException(
+						 String.format("%s: No Entity found with the id: %s", this.getClass().getName(),id));
+				 });
 	}
 
 	@Override

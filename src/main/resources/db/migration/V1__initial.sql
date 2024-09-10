@@ -62,11 +62,17 @@ CREATE TABLE public.course
 
 CREATE TABLE public.payment
 (
-id serial PRIMARY KEY ,
-pay_method integer  not null ,
-pay_amount double precision not null,
-product_type int not null,
-transaction_id varchar(250)not null
+	id serial PRIMARY KEY ,
+	pay_method integer  not null ,
+	pay_amount Integer not null,
+	currency integer not null,
+	payment_status integer not null,
+	product_type int not null,
+	transaction_id varchar(250)not null,
+	buyer_id bigint not null ,
+	created_date timestamp not null,
+	CONSTRAINT payment_buyer_fk FOREIGN KEY(buyer_id)
+		REFERENCES person(id)
 );
 
 CREATE TABLE public.course_student
@@ -124,7 +130,6 @@ CREATE TABLE public.attendance
         NOT VALID
 );
 
-
 --CREATE TABLE public.quiz
 --(
 --    id serial NOT NULL,
@@ -154,4 +159,13 @@ CREATE TABLE public.question
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
         NOT VALID
+);
+
+create table wallet (
+	id serial primary key,
+	transaction_amount INTEGER NOT NULL,
+	person_id BIGINT NOT NULL,
+	created_date TIMESTAMP NOT NULL,
+	CONSTRAINT person_wallet_fk FOREIGN KEY (person_id)
+    	REFERENCES public.person (id)
 );

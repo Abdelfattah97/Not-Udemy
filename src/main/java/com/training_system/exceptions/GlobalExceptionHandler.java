@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<String> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity violation");
+        return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Data integrity violation");
     }
     
     @ExceptionHandler(UnknownStatusException.class)
