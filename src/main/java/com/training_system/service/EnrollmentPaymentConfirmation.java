@@ -44,7 +44,7 @@ public class EnrollmentPaymentConfirmation implements ProductConfirmationStrateg
 			logger.error(ex.getMessage());
 			throw new IllegalConfirmOperationException(String.format("Confirmation Failed: %s", ex.getMessage()));
 		}
-		enrollmentService.confrimEnrollment(enrollment);
+		enrollmentService.confrimEnrollment(payment);
 		paymentService.confirmPayment(payment);
 		walletService.deposit(instructor, payment.getPayAmount());
 		return paymentService.update(payment);

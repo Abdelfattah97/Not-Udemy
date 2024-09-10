@@ -134,8 +134,6 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		enrollmentData.setEnrollment_status(enrollmentStatus);
 		enrollmentRepo.save(enrollmentData);
 	}
-//	@Transactional
-//	public void confirmEnrollments()
 	
 	@Transactional
 	public ResponseEntity<Resource> attendLesson(Long lesson_id, Long student_id) throws IOException {
@@ -151,9 +149,6 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		Enrollment enrollment = enrollmentRepo.findByCourse_Lesson_IdAndStudent_Id(lesson_id, student_id).orElseThrow(() -> new EntityNotFoundException("There is no enrollment for this course_lesson and student"));
 		Payment payment = enrollment.getPayment();
 		
-		
-		
-		
 		if(lesson.getLessonType() == LessonType.LESSON) {
 			// Load Resource Data (Resource, ContentType)
 			ResourceHandler resourceData = new ResourceHandler();
@@ -165,7 +160,9 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	            contentType = "application/octet-stream";
 	        }
 	        if(!student.getAttendedLessons().contains(lesson)) { // The student has not attended before
-				productConfirmationFacade.confirmPayment(payment, null);
+	        	if(!enrollment.getEnrollment_status().equals(EnrollmentStatus.CONFIRMED)) {
+	        		productConfirmationFacade.confirmPayment(payment, null);
+	        	}
 	        	student.addAttendedLesson(lesson);
 				personRepo.save(student);
 			}
@@ -183,7 +180,10 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 			            .contentType(MediaType.TEXT_PLAIN)
 			            .body(resource);
 			}
-			productConfirmationFacade.confirmPayment(payment, null);
+			if(!enrollment.getEnrollment_status().equals(EnrollmentStatus.CONFIRMED)) {
+        		productConfirmationFacade.confirmPayment(payment, null);
+        	}
+			
 			QuestionService qS = new QuestionService();
 			Set<Question> questions = qS.getQuizQuestions(lesson_id);
 			try {
@@ -235,7 +235,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		Enrollment enrollment = enrollmentRepo.findByPayment(payment).orElseThrow(() -> new EntityNotFoundException("There is no enrollment with this payment id!!!"));
 		
 		enrollment.setEnrollment_status(EnrollmentStatus.CONFIRMED);
-		enrollmentRepo.save(enrollment);
+		update(enrollment);
 	}
 	
 	public void cancelEnrollment(Payment payment) {
