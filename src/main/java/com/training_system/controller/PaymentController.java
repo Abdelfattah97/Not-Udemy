@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.training_system.base.ProductTransaction;
 import com.training_system.entity.Course;
 import com.training_system.entity.Enrollment;
 import com.training_system.entity.Payment;
@@ -20,7 +21,10 @@ import com.training_system.entity.Person;
 import com.training_system.entity.dto.ChargeRequest;
 import com.training_system.entity.enums.Currency;
 import com.training_system.entity.enums.ProductType;
+import com.training_system.exceptions.RefundFailureException;
 import com.training_system.service.PaymentService;
+import com.training_system.service.PurchaseFacade;
+import com.training_system.service.RefundExpirationManager;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -28,6 +32,11 @@ public class PaymentController {
 	@Autowired
 	PaymentService paymentService;
 
+	@Autowired
+	PurchaseFacade purchaseFacade;
+	
+	@Autowired
+	RefundExpirationManager refundExpirationManager;
 
 	@GetMapping()
 	public List<Payment> findAll(@AuthenticationPrincipal UserDetails userDetails) {
@@ -41,7 +50,7 @@ public class PaymentController {
 	}
 	
 	@PostMapping("/course/charge")
-	public Enrollment charge(@RequestParam(name = "amount") Integer amountCents, @RequestParam String stripeToken,
+	public ProductTransaction charge(@RequestParam(name = "amount") Integer amountCents, @RequestParam String stripeToken,
 			@RequestParam String stripeTokenType, @RequestParam String stripeEmail, @RequestParam Long person_id,
 			@RequestParam Long course_id) {
 		Person person = new Person();
@@ -53,14 +62,22 @@ public class PaymentController {
 				.description("Course Purchase").amount(amountCents).currency(Currency.USD).stripeEmail(stripeEmail)
 				.stripeToken(stripeToken).productType(ProductType.COURSE_ENROLLMENT).build();
 
-		return paymentService.payCourse(chargeRequest);
+		return purchaseFacade.purchase(chargeRequest);
 
 	}
 
 	@PreAuthorize("@paymentService.isUserOwnerOfPayment(#payment_id,principal.username) or hasAuthority('master')")
 	@GetMapping("/{payment_id}/refund")
 	public Payment refund(@PathVariable Long payment_id ) {
-		return paymentService.refund(payment_id);
+		Payment payment= new Payment();
+		payment.setId(payment_id); 
+		return purchaseFacade.refund(payment);
 	}
 
+	@GetMapping("/limit")
+	public boolean limit() {
+		refundExpirationManager.limitExpiredRefundables();
+		return true;
+	}
+	
 }

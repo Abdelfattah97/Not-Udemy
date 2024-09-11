@@ -68,7 +68,7 @@ CREATE TABLE public.payment
 	currency integer not null,
 	payment_status integer not null,
 	product_type int not null,
-	transaction_id varchar(250)not null,
+	transaction_id varchar(250)not null unique,
 	buyer_id bigint not null ,
 	created_date timestamp not null,
 	CONSTRAINT payment_buyer_fk FOREIGN KEY(buyer_id)

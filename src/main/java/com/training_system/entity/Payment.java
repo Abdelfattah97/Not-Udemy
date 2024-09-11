@@ -24,6 +24,8 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,6 +41,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
+@Table(
+		uniqueConstraints = 
+	    @UniqueConstraint(columnNames = {"transaction_id", "buyer_id"}))
 public class Payment extends BaseEntity<Long> {
 
 	@Convert(converter = PaymentMethodConverter.class)
@@ -51,22 +56,25 @@ public class Payment extends BaseEntity<Long> {
 	private Integer payAmount;
 	
 	@Convert(converter = CurrencyConverter.class)
+	@Column(nullable = false)
 	private Currency currency;
 
 	@Convert(converter = ProductTypeConverter.class)
 	private ProductType productType;
 	
-	
+	@Column(unique = true, nullable = false)
 	private String transactionId;
 	
 	@CreatedDate
+	@Column(nullable = false)
 	private LocalDateTime createdDate;
 	
 	@Convert(converter =PaymentStatusConverter.class)
+	@Column(nullable = false)
 	private PaymentStatus paymentStatus;
 	
 	@ManyToOne
-	@JoinColumn(name = "buyer_id")
+	@JoinColumn(name = "buyer_id",nullable = false)
 	@JsonIncludeProperties(value = {"id","name"})
 	private Person buyer;
 	
