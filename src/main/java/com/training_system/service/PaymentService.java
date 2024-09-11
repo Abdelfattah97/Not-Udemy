@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -29,19 +30,22 @@ import jakarta.transaction.Transactional;
 public class PaymentService extends BaseServiceImpl<Payment, Long> {
 
 	@Autowired
-	EnrollmentService enrollmentService;
+	private EnrollmentService enrollmentService;
 
 //	@Autowired
 //	EnrollmentRepo enrollmentRepo;
 
 	@Autowired
-	PaymentRepo paymentRepo;
+	private PaymentRepo paymentRepo;
 
 	@Autowired
-	PaymentProvider stripePayment;
+	private PaymentProvider stripePayment;
 
 	@Autowired
-	UserService userService;
+	private UserService userService;
+	
+	@Value("${STRIPE_PUBLIC_KEY}")
+	private String paymentProviderPublicKey; 
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -187,6 +191,10 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	public void confirmPayment(Payment payment) {
 		payment.setPaymentStatus(PaymentStatus.UNREFUNDABLE);
 		 update(payment);
+	}
+	
+	String getPaymentProviderPublicKey() {
+		return this.paymentProviderPublicKey;
 	}
 
 }

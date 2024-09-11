@@ -6,10 +6,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.training_system.base.ProductTransaction;
 import com.training_system.entity.Payment;
+import com.training_system.entity.dto.CheckoutRequest;
+import com.training_system.entity.dto.CheckoutResponse;
 import com.training_system.entity.dto.PaymentRequest;
 import com.training_system.entity.enums.ProductType;
 import com.training_system.exceptions.UnSupportedOperationException;
@@ -27,8 +30,8 @@ public class PurchaseFacade {
 
 //	@Autowired
 	private PaymentService paymentService;
-	
-	public PurchaseFacade(List<PurchaseStrategy> strategiesList , @Lazy PaymentService paymentService) {
+
+	public PurchaseFacade(List<PurchaseStrategy> strategiesList, @Lazy PaymentService paymentService) {
 		this.strategies = strategiesList.stream().collect(Collectors.toMap(PurchaseStrategy::getProductType, s -> s));
 		this.paymentService = paymentService;
 	}
@@ -44,6 +47,11 @@ public class PurchaseFacade {
 		payment = paymentService.findById(payment.getId());
 		ProductType productType = payment.getProductType();
 		return strategyFor(productType).refund(payment);
+	}
+
+	public CheckoutResponse checkout(UserDetails userDetails , CheckoutRequest checkoutRequest) {
+		ProductType productType = checkoutRequest.getProductType();
+		return strategyFor(productType).checkout(userDetails,checkoutRequest);
 	}
 
 	PurchaseStrategy strategyFor(ProductType productType) {
