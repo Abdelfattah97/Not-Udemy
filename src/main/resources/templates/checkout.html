@@ -5,14 +5,14 @@
 			<div>
 				<input type='hidden' th:value='${amount}' name='amount' />
 				<div>
-				<h4>Course Purchase:</h4>
-					<h3 th:text="${course.title}"></h3>
+				<h4 th:text="${product.productSimpleName+' Purchase:'}"></h4>
+					<h3 th:text="${product.title}"></h3>
 					<img style="border:1px solid gray;" alt="" width="450" src="https://blog.coursify.me/wp-content/uploads/2018/08/plan-your-online-course.jpg">
 				</div>
 				<div style="margin-top:20px; margin-bottom:20px; font-weight: bold;">				
 				<label >Price: <span style="color:blue;"><span th:text="${amount/100}" /><span> $</span></span></label> <br> 
 				</div>
-				<input type="hidden" , th:value=${course.id} name="course_id"> 
+				<input type="hidden" , th:value=${product.id} name="course_id"> 
 				<input type="hidden" , th:value=${person.id} name="person_id">
 				<!-- NOTE: data-key/data-amount/data-currency will be rendered by Thymeleaf -->
 				<script src='https://checkout.stripe.com/checkout.js'

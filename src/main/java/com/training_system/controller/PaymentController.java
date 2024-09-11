@@ -2,6 +2,8 @@ package com.training_system.controller;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,19 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training_system.base.ProductTransaction;
 import com.training_system.entity.Course;
-import com.training_system.entity.Enrollment;
 import com.training_system.entity.Payment;
 import com.training_system.entity.Person;
 import com.training_system.entity.dto.ChargeRequest;
+import com.training_system.entity.dto.CheckoutRequest;
+import com.training_system.entity.dto.CheckoutResponse;
 import com.training_system.entity.dto.PaymentDto;
 import com.training_system.entity.dto.PurchaseResponse;
 import com.training_system.entity.dto.mapper.PaymentDtoMapper;
 import com.training_system.entity.dto.mapper.PurchaseResponseMapper;
 import com.training_system.entity.enums.Currency;
 import com.training_system.entity.enums.ProductType;
-import com.training_system.exceptions.RefundFailureException;
 import com.training_system.service.PaymentService;
 import com.training_system.service.PurchaseFacade;
 import com.training_system.service.RefundExpirationManager;
@@ -48,16 +49,33 @@ public class PaymentController {
 	@Autowired
 	PaymentDtoMapper paymentDtoMapper;
 	
+	Logger logger = LoggerFactory.getLogger(getClass());
+	
 	@GetMapping
 	public List<PaymentDto> findAll(@AuthenticationPrincipal UserDetails userDetails) {
-		
 		return paymentDtoMapper.toDto(paymentService.findAll(userDetails));
-		
 	}
 	
 	@GetMapping("/{id}")
 	public PaymentDto findById(@PathVariable Long id, @AuthenticationPrincipal UserDetails principal) {
 		return paymentDtoMapper.toDto(paymentService.findById(id));
+	}
+	
+	@PreAuthorize("hasAuthority('student')")
+	@GetMapping("/{productTypeName}/{productId}/checkout")
+	public CheckoutResponse checkout(@AuthenticationPrincipal UserDetails userDetails, 
+	                                 @PathVariable String productTypeName, 
+	                                 @PathVariable Long productId) {
+	    ProductType productType = ProductType.valueOf(productTypeName.toUpperCase());
+
+	    CheckoutResponse response= purchaseFacade.checkout(userDetails,
+	            CheckoutRequest.builder()
+	                           .productType(productType)
+	                           .productId(productId)
+	                           .build());
+//	    logger.warn(response.toString());
+        return response;
+	    
 	}
 	
 	@PostMapping("/purchase/charge")

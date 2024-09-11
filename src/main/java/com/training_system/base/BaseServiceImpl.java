@@ -40,7 +40,7 @@ public class BaseServiceImpl<T extends BaseEntity<ID>,ID> implements BaseService
 				.orElseThrow(()->{
 					logger.error("Entity not found at: "+this.getClass());
 				 throw new EntityNotFoundException(
-						 String.format("%s: No Entity found with the id: %s", this.getClass().getName(),id));
+						 String.format("%s: No Entity found with the id: %s", this.getClass().getSimpleName(),id));
 				 });
 	}
 

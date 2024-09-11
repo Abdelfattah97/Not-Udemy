@@ -59,10 +59,14 @@ public class Course  extends BaseEntity<Long> implements Product{
 	}
 	
 	@Transient
-	@JsonIgnore
 	public String getProductTitle() {
         return this.getTitle();
     }
+	
+	@Transient
+	public String getProductSimpleName() {
+		return "Course";
+	}
 	
 	
 }
