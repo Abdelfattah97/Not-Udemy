@@ -19,12 +19,9 @@ public class WalletController {
 	@Autowired
 	WalletService walletService;
 	
-	@GetMapping("/person/{person_id}")
-	public Double balance(@PathVariable Long person_id, @AuthenticationPrincipal UserDetails userDetails) {
-		Person person = new Person();
-		person.setId(person_id);
-		return walletService.getBalance(person,userDetails);
+	@GetMapping("/balance")
+	public Double balance(@AuthenticationPrincipal UserDetails userDetails) {
+		return walletService.getBalance(userDetails);
 	}
-	
 	
 }

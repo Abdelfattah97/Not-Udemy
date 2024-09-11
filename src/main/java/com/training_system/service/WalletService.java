@@ -70,9 +70,12 @@ public class WalletService {
 		return walletTransactionRepo.findByPersonUser(user);
 	}
 	
-	@PreAuthorize("hasAuthority('master') or @walletService.isUserOwnerOfWallet(#person,principal.username)")
-	public Double getBalance(Person person,UserDetails userDetails) {
-		return walletTransactionRepo.getBalance(person)/100.0;
+//	@PreAuthorize()
+	public Double getBalance(UserDetails userDetails) {
+		Person person =userService.findByUserName(userDetails.getUsername()).getPerson();
+		Integer balanceInCents= walletTransactionRepo.getBalance(person);
+		if(balanceInCents==null) return 0.0;
+		return balanceInCents/100.0;
 	}
 	
 	public boolean isUserOwnerOfWallet(Person person , String userName) {
