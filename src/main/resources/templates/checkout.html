@@ -1,13 +1,13 @@
 <html>
 <body>
-<form action='/api/payment/course/charge' method='POST' id='checkout-form'>
+<form action='/api/payment/course/charge' method='POST' id='checkout-form' >
 <div style="display:flex; justify-content: center; margin-top:100px;">
 			<div>
 				<input type='hidden' th:value='${amount}' name='amount' />
 				<div>
 				<h4>Course Purchase:</h4>
 					<h3 th:text="${course.title}"></h3>
-					<img style="border:1px solid gray;" alt="" src="https://artoftesting.com/wp-content/uploads/2020/03/introduction-to-java-featured.jpg">
+					<img style="border:1px solid gray;" alt="" width="450" src="https://blog.coursify.me/wp-content/uploads/2018/08/plan-your-online-course.jpg">
 				</div>
 				<div style="margin-top:20px; margin-bottom:20px; font-weight: bold;">				
 				<label >Price: <span style="color:blue;"><span th:text="${amount/100}" /><span> $</span></span></label> <br> 

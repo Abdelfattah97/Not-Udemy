@@ -16,7 +16,7 @@ import com.training_system.exceptions.IllegalConfirmOperationException;
 import jakarta.transaction.Transactional;
 
 @Component
-public class EnrollmentPaymentConfirmation implements ProductConfirmationStrategy {
+public class EnrollmentConfirmation implements ProductConfirmationStrategy {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -46,7 +46,7 @@ public class EnrollmentPaymentConfirmation implements ProductConfirmationStrateg
 		}
 		enrollmentService.confrimEnrollment(payment);
 		paymentService.confirmPayment(payment);
-		walletService.deposit(instructor, payment.getPayAmount());
+		walletService.deposit(instructor, calculateRevenue(payment));
 		return paymentService.update(payment);
 	}
 
@@ -56,7 +56,7 @@ public class EnrollmentPaymentConfirmation implements ProductConfirmationStrateg
 	}
 	
 	private Integer calculateRevenue(Payment payment) {
-		return  (payment.getPayAmount()*(int)(instructorRevenuePerEnrollment*100));
+		return (int) (payment.getPayAmount()*(instructorRevenuePerEnrollment));
 	}
 
 }

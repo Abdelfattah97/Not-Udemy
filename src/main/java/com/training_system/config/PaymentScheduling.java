@@ -20,7 +20,7 @@ public class PaymentScheduling {
 	@Scheduled(cron = "0 * * * * ?")
 	public void everyMinCheck() {
 		logger.info("Cron job Started");
-		refundExpirationManager.limitExpiredRefundables();
+//		refundExpirationManager.limitExpiredRefundables();
 		logger.info("Cron job Ended");
 	}
 	

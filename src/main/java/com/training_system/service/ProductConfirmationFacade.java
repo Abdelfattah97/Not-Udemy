@@ -19,10 +19,10 @@ import jakarta.transaction.Transactional;
 @Component
 public class ProductConfirmationFacade {
 
-	private Map<ProductType, ProductConfirmationStrategy> Strategies;
+	private Map<ProductType, ProductConfirmationStrategy> strategies;
 
 	public ProductConfirmationFacade(List<ProductConfirmationStrategy> productConfirmationStrategies) {
-		this.Strategies = productConfirmationStrategies.stream()
+		this.strategies = productConfirmationStrategies.stream()
 				.collect(Collectors.toMap(ProductConfirmationStrategy::getProductType, p -> p));
 	}
 
@@ -53,10 +53,10 @@ public class ProductConfirmationFacade {
 	}
 	
 	private ProductConfirmationStrategy strategyFor(ProductType productType) {
-		if(!Strategies.containsKey(productType)) {
+		if(!strategies.containsKey(productType)) {
 			throw new UnSupportedOperationException(String.format("Product Type: %s has not respective confirmation strategy!", productType));
 		}
-		return Strategies.get(productType);
+		return strategies.get(productType);
 	}
 
 }

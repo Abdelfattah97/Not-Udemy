@@ -13,5 +13,5 @@ import java.util.List;
 public interface EnrollmentRepo extends BaseRepository<Enrollment, Long> {
 	Optional<Enrollment> findByPayment(Payment payment);
 	Optional<Enrollment> findByCourse_IdAndStudent_Id(Long course_id,Long student_id);
-	Optional<Enrollment> findByCourse_Lesson_IdAndStudent_Id(Long lesson_id, Long student_id);
+	Optional<Enrollment> findByCourse_Lessons_IdAndStudent_Id(Long lesson_id, Long student_id);
 }

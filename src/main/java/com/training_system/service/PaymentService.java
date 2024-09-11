@@ -1,13 +1,7 @@
 package com.training_system.service;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +17,12 @@ import com.training_system.entity.Payment;
 import com.training_system.entity.Person;
 import com.training_system.entity.User;
 import com.training_system.entity.dto.PaymentRequest;
-import com.training_system.entity.enums.EnrollmentStatus;
+import com.training_system.entity.enums.PaymentMethod;
 import com.training_system.entity.enums.PaymentStatus;
-import com.training_system.entity.enums.ProductType;
 import com.training_system.exceptions.DuplicateEnrollmentException;
 import com.training_system.exceptions.NotRefundableException;
-import com.training_system.repo.EnrollmentRepo;
 import com.training_system.repo.PaymentRepo;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -39,9 +30,9 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 
 	@Autowired
 	EnrollmentService enrollmentService;
-	
-	@Autowired
-	EnrollmentRepo enrollmentRepo;
+
+//	@Autowired
+//	EnrollmentRepo enrollmentRepo;
 
 	@Autowired
 	PaymentRepo paymentRepo;
@@ -63,10 +54,8 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	public List<Payment> findAll(UserDetails userDetails) {
 		String username = userDetails.getUsername();
 		User user = userService.findByUserName(username);
-		boolean isAdmin = user.getRoles().stream()
-				.filter(role -> role.getName().equalsIgnoreCase("master"))
-				.findAny()
-				.isPresent();		
+		boolean isAdmin = user.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("master")).findAny()
+				.isPresent();
 		if (isAdmin) {
 			return findAll();
 		} else {
@@ -90,21 +79,26 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 		User user = userService.findByUserName(userName);
 		return payment.getBuyer().getId().equals(user.getPerson().getId());
 	}
+
 	public boolean isUserOwnerOfPayment(PaymentRequest paymentRequest, String userName) {
 		Long person_id = paymentRequest.getPerson().getId();
 		User user = userService.findByUserName(userName);
 		return person_id.equals(user.getPerson().getId());
 	}
-	
+
 	// Payments Related
+	/**
+	 * 
+	 * @deprecated This method is deprecated and will be removed 
+	 * @see {@link PurchaseFacade#purchase(PaymentRequest)}
+	 */
 	@PreAuthorize("hasAuthority('master') or @paymentService.isUserOwnerOfPayment(#paymentRequest,principal.username)")
 	@Transactional
+	@Deprecated
 	public Enrollment payCourse(PaymentRequest paymentRequest) {
-		
 		// Ensures no previous Enrollments preventing Duplicate Enrollments and Payments
-		Enrollment prevEnrollment = enrollmentRepo
-				.findByCourse_IdAndStudent_Id(paymentRequest.getProduct().getId(), paymentRequest.getPerson().getId())
-				.orElse(null);
+		Enrollment prevEnrollment = enrollmentService.findByCourseStudent(paymentRequest.getPerson().getId(),
+				paymentRequest.getProduct().getId());
 		if (prevEnrollment != null) {
 			String errMsg = String.format(
 					"Duplicate enrolls are not Allowed: Student with id: %s is already enrolled in Course with id: %s",
@@ -121,32 +115,22 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 		course.setId(paymentRequest.getProduct().getId());
 
 		return enrollmentService.enroll(paymentRequest.getPerson(), course, payment);
-
 	}
 
-	
-	/**
-	 * makes a payment unrefundable , and any further actions needed
-	 * @return the given payment with a 
-	 */
-	 Payment lockPayment(Payment payment) {
-		payment.setPaymentStatus(PaymentStatus.UNREFUNDABLE);
-		 return update(payment);
-		
-	}
-	
 	// Refunds Related
 	@PreAuthorize("hasAuthority('master') or @paymentService.isUserOwnerOfPayment(#payment_id,principal.username)")
 	@Transactional
-	public Payment refund(Long payment_id) {
+	protected Payment refund(Long payment_id) {
 		Payment payment = findById(payment_id);
-		// Ensures Payment is refundable before proceeding to a refund request to the payment provider
+		// Ensures Payment is refundable before proceeding to a refund request to the
+		// payment provider
 		if (!isRefundable(payment_id)) {
 			throw new NotRefundableException(String.format("Payment with id: %s is Not Refundable", payment_id));
 		}
-		Supplier<Payment> afterRefundOperations = preparePruchaseCancellation(payment);
+		payment.setPaymentStatus(PaymentStatus.REFUNDED);
+		update(payment);
 		stripePayment.refund(payment);
-		return afterRefundOperations.get();
+		return payment;
 	}
 
 	public boolean isRefundable(Long payment_id) {
@@ -157,38 +141,52 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 		return payment.getPaymentStatus().equals(PaymentStatus.REFUNDABLE);
 	}
 
-	private Supplier<Payment> preparePruchaseCancellation(Payment payment) {
-		ProductType productType = Objects.requireNonNull(payment.getProductType());
-
-		switch (productType) {
-
-		case COURSE_ENROLLMENT: {
-			// Ensures the Enrollment Exists bef proceeding
-			Enrollment enrollment = enrollmentRepo.findByPayment(payment).orElseThrow(() -> new EntityNotFoundException(
-					String.format("No Enrollment found for payment of id: %s", payment.getId())));
-
-			// This Supplier should be used after the provider refund operation is completed
-			// successfully
-			return () -> {
-				// Deletes Enrollment
-				enrollmentRepo.deleteById(enrollment.getId());
-				// Changes Payment Status
-				payment.setPaymentStatus(PaymentStatus.REFUNDED);
-				// Update Payment State in DB
-				return update(payment);
-			};
-		}
-		default: {
-			throw new IllegalArgumentException(
-					"Product Type not relating to an operation on cancel, Ensure Payment Service Supports Cancellation of this type!");
-		}
-		}
-
+	
+	/**
+	 * Initializes a new payment based on the provided payment request.
+	 * this could be considered as a paymentIntent
+	 * @param paymentRequest The payment request containing details such as the buyer, product type,
+	 *                       amount, currency, and payment method.
+	 * @return The newly created payment entity with the provided details and saved in the database  with status PaymentProcessing.
+	 */
+	protected Payment intializePayment(PaymentRequest paymentRequest) {
+		Payment payment = Payment.builder()
+				.buyer(paymentRequest.getPerson())
+				.productType(paymentRequest.getProductType())
+                .payAmount(paymentRequest.getAmount())
+                .currency(paymentRequest.getCurrency())
+                .payMethod(PaymentMethod.STRIPE_CHARGE)
+                .paymentStatus(PaymentStatus.PayingProcess)
+                .transactionId(paymentRequest.getProviderKey())
+                .build();
+		return insert(payment);
 	}
 
-	public Payment confirmPayment(Payment payment) {
-		payment.setPaymentStatus(PaymentStatus.UNREFUNDABLE);
+	/**
+	 * Proceeds to pay for a given payment request using the provided payment details.
+	 * This method integrates with the payment provider to process the payment.
+	 * After successful payment, the payment status is updated to REFUNDABLE and the payment
+	 * is updated to REFUNDABLE in the database.
+	 * 
+	 * <b>it is recommended to use this method as the last operation to prevent disputes and refund fees on failures</b>
+	 *
+	 * @param paymentRequest The payment request containing details such as the buyer, product type,
+	 *                       amount, currency, and payment method.
+	 * @param payment        The existing payment entity to be updated with the new payment details.
+	 *                       This entity is used to maintain the integrity of the payment process.
+	 * @return The updated payment entity with the new payment status and saved in the database.
+	 */
+	@Transactional
+	protected Payment ProceedToPay(PaymentRequest paymentRequest,Payment payment) {
+		Payment charged = stripePayment.pay(paymentRequest);
+		payment.setTransactionId(charged.getTransactionId());
+		payment.setPaymentStatus(charged.getPaymentStatus());
 		return update(payment);
+	}
+
+	public void confirmPayment(Payment payment) {
+		payment.setPaymentStatus(PaymentStatus.UNREFUNDABLE);
+		 update(payment);
 	}
 
 }

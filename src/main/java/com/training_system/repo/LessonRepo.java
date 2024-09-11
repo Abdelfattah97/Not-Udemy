@@ -11,7 +11,6 @@ import com.training_system.entity.Person;
 
 @Repository
 public interface LessonRepo extends BaseRepository<Lesson, Long>{
-	Optional<Lesson> findByCourse_IdAndStudent_Id(Long course_id, Long student_id);
 
 	Set<Lesson> findByCourse_Id(Long course_id);
 

@@ -13,14 +13,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.training_system.base.ProductTransaction;
 import com.training_system.entity.Course;
 import com.training_system.entity.Enrollment;
 import com.training_system.entity.Payment;
 import com.training_system.entity.Person;
 import com.training_system.entity.dto.ChargeRequest;
+import com.training_system.entity.dto.PaymentDto;
+import com.training_system.entity.dto.PurchaseResponse;
+import com.training_system.entity.dto.mapper.PaymentDtoMapper;
+import com.training_system.entity.dto.mapper.PurchaseResponseMapper;
 import com.training_system.entity.enums.Currency;
 import com.training_system.entity.enums.ProductType;
+import com.training_system.exceptions.RefundFailureException;
 import com.training_system.service.PaymentService;
+import com.training_system.service.PurchaseFacade;
+import com.training_system.service.RefundExpirationManager;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -28,20 +36,32 @@ public class PaymentController {
 	@Autowired
 	PaymentService paymentService;
 
-
-	@GetMapping()
-	public List<Payment> findAll(@AuthenticationPrincipal UserDetails userDetails) {
-		return paymentService.findAll(userDetails);
+	@Autowired
+	PurchaseFacade purchaseFacade;
+	
+	@Autowired
+	RefundExpirationManager refundExpirationManager;
+	
+	@Autowired
+	PurchaseResponseMapper purchaseResponseMapper;
+	
+	@Autowired
+	PaymentDtoMapper paymentDtoMapper;
+	
+	@GetMapping
+	public List<PaymentDto> findAll(@AuthenticationPrincipal UserDetails userDetails) {
+		
+		return paymentDtoMapper.toDto(paymentService.findAll(userDetails));
 		
 	}
 	
 	@GetMapping("/{id}")
-	public Payment findById(@PathVariable Long id, @AuthenticationPrincipal UserDetails principal) {
-		return paymentService.findById(id);
+	public PaymentDto findById(@PathVariable Long id, @AuthenticationPrincipal UserDetails principal) {
+		return paymentDtoMapper.toDto(paymentService.findById(id));
 	}
 	
-	@PostMapping("/course/charge")
-	public Enrollment charge(@RequestParam(name = "amount") Integer amountCents, @RequestParam String stripeToken,
+	@PostMapping("/purchase/charge")
+	public PurchaseResponse charge(@RequestParam(name = "amount") Integer amountCents, @RequestParam String stripeToken,
 			@RequestParam String stripeTokenType, @RequestParam String stripeEmail, @RequestParam Long person_id,
 			@RequestParam Long course_id) {
 		Person person = new Person();
@@ -53,14 +73,21 @@ public class PaymentController {
 				.description("Course Purchase").amount(amountCents).currency(Currency.USD).stripeEmail(stripeEmail)
 				.stripeToken(stripeToken).productType(ProductType.COURSE_ENROLLMENT).build();
 
-		return paymentService.payCourse(chargeRequest);
-
+		return purchaseResponseMapper.toDto(purchaseFacade.purchase(chargeRequest));
 	}
 
 	@PreAuthorize("@paymentService.isUserOwnerOfPayment(#payment_id,principal.username) or hasAuthority('master')")
 	@GetMapping("/{payment_id}/refund")
-	public Payment refund(@PathVariable Long payment_id ) {
-		return paymentService.refund(payment_id);
+	public PaymentDto refund(@PathVariable Long payment_id ) {
+		Payment payment= new Payment();
+		payment.setId(payment_id); 
+		return paymentDtoMapper.toDto(purchaseFacade.refund(payment));
 	}
 
+	@GetMapping("/limit")
+	public boolean limit() {
+		refundExpirationManager.limitExpiredRefundables();
+		return true;
+	}
+	
 }

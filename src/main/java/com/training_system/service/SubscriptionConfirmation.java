@@ -1,5 +1,7 @@
 package com.training_system.service;
 
+import javax.management.RuntimeErrorException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import com.training_system.exceptions.IllegalConfirmOperationException;
 import lombok.RequiredArgsConstructor;
 
 @Component
-public class SubscriptionPaymentConfirmation  implements ProductConfirmationStrategy{
+public class SubscriptionConfirmation  implements ProductConfirmationStrategy{
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	

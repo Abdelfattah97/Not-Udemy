@@ -2,15 +2,22 @@ package com.training_system.entity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.training_system.base.BaseEntity;
+import com.training_system.base.Product;
+import com.training_system.base.ProductTransaction;
+import com.training_system.converter.EnrollmentStatusConverter;
 import com.training_system.entity.enums.EnrollmentStatus;
+import com.training_system.entity.enums.ProductType;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -30,7 +37,7 @@ uniqueConstraints =
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Enrollment extends BaseEntity<Long> {
+public class Enrollment extends BaseEntity<Long> implements ProductTransaction {	
 
 	@ManyToOne
 	@JoinColumn(name="student_id",nullable = false)
@@ -48,6 +55,33 @@ public class Enrollment extends BaseEntity<Long> {
 	private LocalDate enrollmentDate;
 	
 	@Column(name="enrollment_status")
+	@Convert(converter = EnrollmentStatusConverter.class)
 	private EnrollmentStatus enrollment_status;
+
+	@Override
+	@Transient
+	@JsonIgnore
+	public Person getBuyer() {
+	return this.student;
+	}
+
+	@Override
+	@Transient
+	@JsonIgnore
+	public Product getProduct() {
+		return this.course;
+	}
+
+	@Override
+	public LocalDate getTransactiontDate() {
+		return this.enrollmentDate;
+	}
+
+	@Override
+	@Transient
+//	@JsonIgnore
+	public ProductType getProductType() {
+		return ProductType.COURSE_ENROLLMENT;
+	}
 	
 }

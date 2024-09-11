@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,12 +68,13 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	private UserRepo userRepo;
 	
 	@Autowired
+	@Lazy
 	private ProductConfirmationFacade productConfirmationFacade;
 
 	private EnrollmentStatus determineEnrollmentStatus(PaymentStatus paymentStatus) {
 		switch (paymentStatus) {
 
-			case REFUNDABLE: {
+			case REFUNDABLE,PayingProcess: {
 				return EnrollmentStatus.REFUNDABLE;
 			}
 			case FAILED: {
@@ -94,7 +96,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	}
 	public Enrollment findByPayment(Payment payment) {
 		return enrollmentRepo.findByPayment(payment).orElseThrow(()->
-		 new EntityNotFoundException(String.format("No Enrollment Found for payment of id: ",payment.getBuyer().getId()))
+		 new EntityNotFoundException(String.format("No Enrollment Found for payment of id: %s",payment.getId()))
 		);
 	}
 	
@@ -149,7 +151,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		
 		Person student = personRepo.findById(student_id).get();
 		Lesson lesson = lessonRepo.findById(lesson_id).get();
-		Enrollment enrollment = enrollmentRepo.findByCourse_Lesson_IdAndStudent_Id(lesson_id, student_id).orElseThrow(() -> new EntityNotFoundException("There is no enrollment for this course_lesson and student"));
+		Enrollment enrollment = enrollmentRepo.findByCourse_Lessons_IdAndStudent_Id(lesson_id, student_id).orElseThrow(() -> new EntityNotFoundException("There is no enrollment for this course_lesson and student"));
 		Payment payment = enrollment.getPayment();
 		
 		if(lesson.getLessonType() == LessonType.LESSON) {
