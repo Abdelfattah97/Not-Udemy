@@ -2,6 +2,7 @@ package com.training_system.entity;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.training_system.base.BaseEntity;
 import com.training_system.base.Product;
 import com.training_system.converter.CourseStatusConverter;
@@ -16,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -59,5 +61,12 @@ public class Course  extends BaseEntity<Long> implements Product{
 		this.lessons.add(lesson);
 		lesson.setCourse(this);
 	}
+	
+	@Transient
+	@JsonIgnore
+	public String getProductTitle() {
+        return this.getTitle();
+    }
+	
 	
 }

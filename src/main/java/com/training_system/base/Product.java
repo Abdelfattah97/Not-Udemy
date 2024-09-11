@@ -6,4 +6,6 @@ public interface Product {
 	
 	Long getId();
 	
+	String getProductTitle();
+	
 }

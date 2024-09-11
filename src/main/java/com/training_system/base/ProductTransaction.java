@@ -8,6 +8,8 @@ import com.training_system.entity.enums.ProductType;
 
 public interface ProductTransaction {
 
+	Long getId();
+
 	Person getBuyer();
 
 	Product getProduct();
@@ -15,7 +17,7 @@ public interface ProductTransaction {
 	Payment getPayment();
 
 	LocalDate getTransactiontDate();
-	
+
 	ProductType getProductType();
 
 }

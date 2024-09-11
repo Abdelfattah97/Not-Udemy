@@ -17,7 +17,7 @@ import com.training_system.exceptions.IllegalConfirmOperationException;
 import lombok.RequiredArgsConstructor;
 
 @Component
-public class SubscriptionPaymentConfirmation  implements ProductConfirmationStrategy{
+public class SubscriptionConfirmation  implements ProductConfirmationStrategy{
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
