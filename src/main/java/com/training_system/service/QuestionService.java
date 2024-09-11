@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.training_system.base.BaseServiceImpl;
 import com.training_system.entity.Lesson;
 import com.training_system.entity.Question;
+import com.training_system.entity.dto.QuestionDto;
+import com.training_system.repo.LessonRepo;
 import com.training_system.repo.QuestionRepo;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -18,30 +20,32 @@ public class QuestionService extends BaseServiceImpl<Question, Long> {
 	@Autowired
 	private QuestionRepo questionRepo;
 	
-	public Set<Question> getQuizQuestions(Long quiz_id){
-		return questionRepo.findByQuiz_Id(quiz_id);
+	@Autowired
+	private LessonRepo lessonRepo;
+	
+	public Set<QuestionDto> getQuizQuestions(Long quiz_id){
+		return QuestionDto.fromEntitiesToDtos(questionRepo.findByQuiz_Id(quiz_id)); 
 	}
 	
-	public Question addQuestion(Lesson quiz, String content, String answerA, String answerB, String answerC, String answerD, Character correctAnswer) {
-		Question question = new Question(quiz, content, answerA, answerB, answerC, answerD, correctAnswer);
+	public Question addQuestion(QuestionDto questionDto) {
+		
+		Lesson quiz = lessonRepo.findById(questionDto.getQuiz_id()).orElseThrow(() -> new EntityNotFoundException("There is no quiz with this id"));
+		
+		Question question = new Question(quiz, questionDto.getContent(), questionDto.getAnswerA(), questionDto.getAnswerB(), questionDto.getAnswerC(), questionDto.getAnswerD(), questionDto.getCorrectAnswer());
 		return questionRepo.save(question);
 	}
 	
-	public void deleteQuestion(Question question) {
-		Question questionObj = questionRepo.findById(question.getId()).orElseThrow(() -> new EntityNotFoundException("Could not delete question with id = " + question.getId() + " because it is Not Found!!!"));
-		questionRepo.delete(questionObj);
+	public void deleteQuestion(Long question_id) {
+		Question question = questionRepo.findById(question_id).orElseThrow(() -> new EntityNotFoundException("Could not delete question with id = " + question_id + " because it is Not Found!!!"));
+		questionRepo.delete(question);
 	}
 	
 	@Transactional
-	public Question updateQuestion(Question question, Lesson quiz, String content, String answerA, String answerB, String answerC, String answerD, Character correctAnswer) {
-		question.setQuiz(quiz);
-		question.setAnswerD(content);
-		question.setAnswerA(answerA);
-		question.setAnswerB(answerB);
-		question.setAnswerC(answerC);
-		question.setAnswerD(answerD);
-		question.setCorrectAnswer(correctAnswer);
+	public Question updateQuestion(QuestionDto questionDto) {
+		Lesson quiz = lessonRepo.findById(questionDto.getQuiz_id()).orElseThrow(() -> new EntityNotFoundException("There is no quiz with this id"));
 		
-		return questionRepo.save(question);
+		Question question = new Question(quiz, questionDto.getContent(), questionDto.getAnswerA(), questionDto.getAnswerB(), questionDto.getAnswerC(), questionDto.getAnswerD(), questionDto.getCorrectAnswer());
+		
+		return update(question);
 	}
 }

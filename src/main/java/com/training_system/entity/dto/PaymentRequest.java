@@ -6,8 +6,6 @@ import com.training_system.entity.Person;
 import com.training_system.entity.enums.Currency;
 import com.training_system.entity.enums.ProductType;
 
-import lombok.Data;
-
 
 public interface PaymentRequest {
 

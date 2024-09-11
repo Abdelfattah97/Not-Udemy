@@ -18,6 +18,9 @@ import com.training_system.entity.Payment;
 import com.training_system.entity.Person;
 import com.training_system.entity.Question;
 import com.training_system.entity.User;
+import com.training_system.entity.dto.CourseDto;
+import com.training_system.entity.dto.LessonDto;
+import com.training_system.entity.dto.QuestionDto;
 import com.training_system.entity.enums.EnrollmentStatus;
 import com.training_system.entity.enums.LessonType;
 import com.training_system.entity.enums.PaymentStatus;
@@ -185,11 +188,11 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
         	}
 			
 			QuestionService qS = new QuestionService();
-			Set<Question> questions = qS.getQuizQuestions(lesson_id);
+			Set<QuestionDto> questionsDtos = qS.getQuizQuestions(lesson_id);
 			try {
 			    // Convert Set<Question> to JSON
 			    ObjectMapper objectMapper = new ObjectMapper();
-			    String jsonQuestions = objectMapper.writeValueAsString(questions);
+			    String jsonQuestions = objectMapper.writeValueAsString(questionsDtos);
 			    
 			    // Create ByteArrayResource from JSON string
 			    ByteArrayResource resource = new ByteArrayResource(jsonQuestions.getBytes());
@@ -210,25 +213,29 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		}	
 	}
 	
-	public Set<Course> getEnrolledCourses(Long user_id){
+	public Set<CourseDto> getEnrolledCourses(Long user_id){
 		User user = userRepo.findById(user_id).orElseThrow(() -> new EntityNotFoundException("There is no user with this id!!!"));
 		Person student = personRepo.findByUser_Id(user_id).orElseThrow(() -> new EntityNotFoundException("There is no student with this id!!!"));
 		
-		return enrollmentRepo.findAll().stream()
+		Set<Course> courses = enrollmentRepo.findAll().stream()
 			    .filter(enrollment -> enrollment.getStudent().getId().equals(student.getId()))
 			    .map(enrollment -> courseRepo.findById(enrollment.getCourse().getId()).orElse(null))
 			    .filter(Objects::nonNull) // Filter out null values
 			    .collect(Collectors.toSet());
+		
+		return CourseDto.fromEntitiesToDto(courses);
 	}
 	
-	public Set<Lesson> getEnrolledCourseLessons(Long user_id, Long course_id){
+	public Set<LessonDto> getEnrolledCourseLessons(Long user_id, Long course_id){
 		User user = userRepo.findById(user_id).orElseThrow(() -> new EntityNotFoundException("There is no user with this id!!!"));
 		
 		Person student = personRepo.findByUser_Id(user_id).orElseThrow(() -> new EntityNotFoundException("There is no student with this id!!!"));
 
 		Course course = courseRepo.findById(course_id).orElseThrow(() -> new EntityNotFoundException("There is no course with this id!!!"));
 		
-		return lessonRepo.findByCourse_IdAndCourse_Enrollments_Student_Id(course_id, student.getId());
+		Set<Lesson> lessons = lessonRepo.findByCourse_IdAndCourse_Enrollments_Student_Id(course_id, student.getId());
+		
+		return LessonDto.fromEntitiesToDtos(lessons);
 	}
 	
 	public void confrimEnrollment(Payment payment) {

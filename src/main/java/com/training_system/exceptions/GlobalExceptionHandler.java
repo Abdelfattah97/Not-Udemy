@@ -1,5 +1,7 @@
 package com.training_system.exceptions;
 
+import java.io.IOException;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,5 +26,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnknownStatusException.class)
     public ResponseEntity<String> handleUnknownStatus(UnknownStatusException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Found Unknow Status");
+    }
+    
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<String> handleIoException(IOException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 }

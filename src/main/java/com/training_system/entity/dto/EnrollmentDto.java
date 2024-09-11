@@ -4,16 +4,9 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.training_system.entity.Course;
 import com.training_system.entity.Enrollment;
-import com.training_system.entity.Payment;
-import com.training_system.entity.Person;
 import com.training_system.entity.enums.EnrollmentStatus;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

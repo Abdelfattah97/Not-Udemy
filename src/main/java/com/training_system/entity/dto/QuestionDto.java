@@ -3,10 +3,8 @@ package com.training_system.entity.dto;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.training_system.entity.Lesson;
 import com.training_system.entity.Question;
 
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
