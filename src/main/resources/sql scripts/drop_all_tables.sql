@@ -18,4 +18,7 @@ drop table if exists person_user_types cascade;
 drop table if exists wallet cascade;
 drop table if exists quiz cascade;
 drop table if exists question cascade;
+drop table if exists roles_authorities cascade;
+drop table if exists authority cascade;
+drop view if exists user_role_auth;
 delete from public.flyway_schema_history;

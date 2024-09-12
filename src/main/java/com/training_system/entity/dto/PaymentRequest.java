@@ -20,9 +20,9 @@ public interface PaymentRequest {
 	
 	public String getProviderKey();
 	
-	public Person getPerson();
+	public Long getPersonId();
 	
-	public Product getProduct();
+	public Long getProductId();
 	
 	public ProductType getProductType();
 	

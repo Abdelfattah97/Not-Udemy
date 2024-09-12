@@ -49,11 +49,14 @@ public class EnrollmentPurchaseStrategy implements PurchaseStrategy {
 		duplicateEnrollmentCheck(paymentRequest);
 
 		Course course = new Course();
-		course.setId(paymentRequest.getProduct().getId());
-
+		course.setId(paymentRequest.getProductId());
+		
+		Person person = new Person();
+		person.setId(paymentRequest.getPersonId());
+		
 		// Confirming the enrollment before proceeding with the payment process.
 		Payment payment = paymentService.intializePayment(paymentRequest);
-		Enrollment enrollment = enrollmentService.enroll(paymentRequest.getPerson(), course, payment);
+		Enrollment enrollment = enrollmentService.enroll(person, course, payment);
 
 		// should keep it last one to prevent disputes and refunds fees
 		payment = paymentService.ProceedToPay(paymentRequest, payment);
@@ -74,10 +77,14 @@ public class EnrollmentPurchaseStrategy implements PurchaseStrategy {
 	}
 
 	private void duplicateEnrollmentCheck(PaymentRequest paymentRequest) {
-		 duplicateEnrollmentCheck(paymentRequest.getPerson(), paymentRequest.getProduct());
+		Person student = new Person();
+		student.setId(paymentRequest.getPersonId());
+		Course course = new Course();
+		course.setId(paymentRequest.getProductId());
+		 duplicateEnrollmentCheck(student, course);
 	}
 	
-	private void duplicateEnrollmentCheck(Person student , Product course ) {
+	private void duplicateEnrollmentCheck(Person student , Course course ) {
 		Enrollment prevEnrollment = enrollmentService.findByCourseStudent(course.getId(),
 				student.getId());
 		if (prevEnrollment != null) {

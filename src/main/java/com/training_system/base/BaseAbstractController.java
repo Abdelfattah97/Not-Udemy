@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-public abstract class BaseControllerImpl<T extends BaseEntity<ID>,ID> implements BaseController<T, ID>{
+public abstract class BaseAbstractController<T extends BaseEntity<ID>,ID> implements BaseController<T, ID>{
 
 	@Autowired
 	BaseService<T, ID> baseService;

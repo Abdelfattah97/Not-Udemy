@@ -1,0 +1,1 @@
+ create view user_role_auth as( select u.id as user_id, u.username, r.name as role, a.name as authority from roles_Authorities ra left join users_roles ur on ur.role_id = ra.role_id left join usr u on ur.user_id = u.id left join authority a on a.id = ra.authority_id left join role r on ra.role_id = r.id);

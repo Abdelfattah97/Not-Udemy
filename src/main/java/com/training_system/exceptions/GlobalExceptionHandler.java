@@ -76,9 +76,28 @@ public class GlobalExceptionHandler {
     
     
     @ExceptionHandler(UserNotFountException.class)
-    public ResponseEntity<String> UserNotFound(UserNotFountException ex) {
+    public ResponseEntity<String> handleUserNotFound(UserNotFountException ex) {
     	logger.warn(ex.getMessage(),ex);
     	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("user not found!");
     }
+    
+    @ExceptionHandler(NoRoleRegistrationException.class)
+    public ResponseEntity<String> handleNoRoleRegistration(NoRoleRegistrationException ex) {
+    	logger.warn(ex.getMessage(),ex);
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("message", ex.getMessage()).body("Registering User with no role is not allowrd!");
+    }
+    
+    @ExceptionHandler(EntityAlreadyExistException.class)
+    public ResponseEntity<String> handleNoRoleRegistration(EntityAlreadyExistException ex) {
+    	logger.warn(ex.getMessage(),ex);
+    	return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Inserting A Duplicate record");
+    }
+    @ExceptionHandler(EntitiesMatchingException.class)
+    public ResponseEntity<String> handleNoRoleRegistration(EntitiesMatchingException ex) {
+    	logger.warn(ex.getMessage(),ex);
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("message", ex.getMessage()).body(ex.getMessage());
+    }
+    
+    
     
 }

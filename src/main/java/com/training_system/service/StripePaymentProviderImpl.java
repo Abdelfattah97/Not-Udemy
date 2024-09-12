@@ -17,6 +17,7 @@ import com.stripe.exception.InvalidRequestException;
 import com.stripe.model.Charge;
 import com.stripe.model.Refund;
 import com.training_system.entity.Payment;
+import com.training_system.entity.Person;
 import com.training_system.entity.dto.PaymentRequest;
 import com.training_system.entity.enums.PaymentMethod;
 import com.training_system.entity.enums.PaymentStatus;
@@ -54,7 +55,9 @@ public final class StripePaymentProviderImpl implements PaymentProvider {
 		}
 
 		// Payment Initialization
-		Payment payment = Payment.builder().buyer(chargeRequest.getPerson()).productType(chargeRequest.getProductType())
+		Person buyer = new Person();
+		buyer.setId(chargeRequest.getPersonId());
+		Payment payment = Payment.builder().buyer(buyer).productType(chargeRequest.getProductType())
 				.payAmount(chargeRequest.getAmount()).currency(chargeRequest.getCurrency())
 				.payMethod(PaymentMethod.STRIPE_CHARGE).paymentStatus(getPaymentStatus(charge.getStatus()))
 				.transactionId(charge.getId()).build();

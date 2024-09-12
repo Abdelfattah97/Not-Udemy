@@ -22,6 +22,7 @@ import com.training_system.entity.enums.PaymentMethod;
 import com.training_system.entity.enums.PaymentStatus;
 import com.training_system.exceptions.DuplicateEnrollmentException;
 import com.training_system.exceptions.NotRefundableException;
+import com.training_system.exceptions.UnAuthorizedException;
 import com.training_system.repo.PaymentRepo;
 
 import jakarta.transaction.Transactional;
@@ -56,8 +57,9 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	}
 
 	public List<Payment> findAll(UserDetails userDetails) {
-		String username = userDetails.getUsername();
-		User user = userService.findByUserName(username);
+//		String username = userDetails.getUsername();
+//		User user = userService.findByUserName(username);
+		User user = userService.getCurrentUser();
 		boolean isAdmin = user.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("master")).findAny()
 				.isPresent();
 		if (isAdmin) {
@@ -70,6 +72,7 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	@Override
 	@PreAuthorize("hasAuthority('master') or @paymentService.isUserOwnerOfPayment(#id,principal.username)")
 	public Payment findById(Long id) {
+//		is
 		return super.findById(id);
 	}
 
@@ -81,11 +84,14 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	public boolean isUserOwnerOfPayment(Long payment_id, String userName) {
 		Payment payment = findById(payment_id);
 		User user = userService.findByUserName(userName);
+		return isUserOwnerOfPayment(payment, user);
+	}
+	public boolean isUserOwnerOfPayment(Payment payment, User user) {
 		return payment.getBuyer().getId().equals(user.getPerson().getId());
 	}
 
 	public boolean isUserOwnerOfPayment(PaymentRequest paymentRequest, String userName) {
-		Long person_id = paymentRequest.getPerson().getId();
+		Long person_id = paymentRequest.getPersonId();
 		User user = userService.findByUserName(userName);
 		return person_id.equals(user.getPerson().getId());
 	}
@@ -101,12 +107,12 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	@Deprecated
 	public Enrollment payCourse(PaymentRequest paymentRequest) {
 		// Ensures no previous Enrollments preventing Duplicate Enrollments and Payments
-		Enrollment prevEnrollment = enrollmentService.findByCourseStudent(paymentRequest.getPerson().getId(),
-				paymentRequest.getProduct().getId());
+		Enrollment prevEnrollment = enrollmentService.findByCourseStudent(paymentRequest.getPersonId(),
+				paymentRequest.getProductId());
 		if (prevEnrollment != null) {
 			String errMsg = String.format(
 					"Duplicate enrolls are not Allowed: Student with id: %s is already enrolled in Course with id: %s",
-					paymentRequest.getPerson().getId(), paymentRequest.getProduct().getId());
+					paymentRequest.getPersonId(), paymentRequest.getProductId());
 			logger.error(errMsg);
 			throw new DuplicateEnrollmentException(errMsg);
 		}
@@ -116,9 +122,10 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 		payment = paymentRepo.save(payment);
 
 		Course course = new Course();
-		course.setId(paymentRequest.getProduct().getId());
-
-		return enrollmentService.enroll(paymentRequest.getPerson(), course, payment);
+		course.setId(paymentRequest.getProductId());
+		Person person = new Person();
+		person.setId(paymentRequest.getPersonId());
+		return enrollmentService.enroll(person, course, payment);
 	}
 
 	// Refunds Related
@@ -126,6 +133,9 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	@Transactional
 	protected Payment refund(Long payment_id) {
 		Payment payment = findById(payment_id);
+		if(!isUserOwnerOfPayment(payment,userService.getCurrentUser())) {
+			throw new UnAuthorizedException("User is not the owner of the payment");
+		}
 		// Ensures Payment is refundable before proceeding to a refund request to the
 		// payment provider
 		if (!isRefundable(payment_id)) {
@@ -154,8 +164,10 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	 * @return The newly created payment entity with the provided details and saved in the database  with status PaymentProcessing.
 	 */
 	protected Payment intializePayment(PaymentRequest paymentRequest) {
+		Person buyer = new Person();
+		buyer.setId(paymentRequest.getPersonId());
 		Payment payment = Payment.builder()
-				.buyer(paymentRequest.getPerson())
+				.buyer(buyer)
 				.productType(paymentRequest.getProductType())
                 .payAmount(paymentRequest.getAmount())
                 .currency(paymentRequest.getCurrency())

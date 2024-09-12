@@ -40,7 +40,7 @@ public class NavigationController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@PreAuthorize("hasAuthority('student')")
+	@PreAuthorize("hasAuthority('enroll_course')")
 	@GetMapping("api/payment/{productTypename}/{productId}/checkout/ui")
 	public String checkout(Model model, @AuthenticationPrincipal UserDetails userDetails,
 			@PathVariable Long productId ,@PathVariable String productTypename ) {
@@ -58,6 +58,7 @@ public class NavigationController {
 		model.addAttribute("currency", checkoutResponse.getCurrency());
 		model.addAttribute("person", person);
 		model.addAttribute("product", product);
+		model.addAttribute("productType",productType);
 		
 		return "checkout";
 	}

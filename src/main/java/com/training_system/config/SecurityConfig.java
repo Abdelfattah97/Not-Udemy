@@ -31,7 +31,10 @@ public class SecurityConfig {
         .permitAll());
 
     // Configure Authorization
-    http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+    http.authorizeHttpRequests(auth -> auth
+    		.requestMatchers("/api/user/register").permitAll()
+//    		.requestMatchers("/api/course/add").hasRole("ADMIN")
+    		.anyRequest().authenticated());
 
     return http.build();
   }
