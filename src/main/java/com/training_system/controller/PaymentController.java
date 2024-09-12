@@ -1,7 +1,6 @@
 package com.training_system.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -22,6 +20,7 @@ import com.training_system.entity.dto.ChargeRequest;
 import com.training_system.entity.dto.CheckoutRequest;
 import com.training_system.entity.dto.CheckoutResponse;
 import com.training_system.entity.dto.PaymentDto;
+import com.training_system.entity.dto.PurchaseResponse;
 import com.training_system.entity.dto.mapper.PaymentDtoMapper;
 import com.training_system.entity.dto.mapper.PurchaseResponseMapper;
 import com.training_system.entity.enums.ProductType;
@@ -54,12 +53,19 @@ public class PaymentController {
 		return paymentDtoMapper.toDto(paymentService.findAll(userDetails));
 	}
 	
+	@GetMapping("/admin")
+	@PreAuthorize("hasRole('master')")
+	public List<PaymentDto> findAll(){
+		return paymentDtoMapper.toDto(paymentService.findAll());
+	}
+	
 	@GetMapping("/{id}")
+	@PreAuthorize("hasRole('master') or(hasAuthority('view_payment') and @paymentService.isUserOwnerOfPayment(#id,principal.username) )")
 	public PaymentDto findById(@PathVariable Long id, @AuthenticationPrincipal UserDetails principal) {
 		return paymentDtoMapper.toDto(paymentService.findById(id));
 	}
 	
-	@PreAuthorize("hasAuthority('student')")
+	@PreAuthorize("hasRole('student') or hasRole('master')")
 	@GetMapping("/{productTypeName}/{productId}/checkout")
 	public CheckoutResponse checkout(@AuthenticationPrincipal UserDetails userDetails, 
 	                                 @PathVariable String productTypeName, 
@@ -71,34 +77,20 @@ public class PaymentController {
 	                           .productType(productType)
 	                           .productId(productId)
 	                           .build());
-//	    logger.warn(response.toString());
         return response;
 	    
 	}
 	
-//	@PostMapping("/purchase/charge")
-//	public PurchaseResponse charge(@RequestParam(name = "amount") Integer amountCents, @RequestParam String stripeToken,
-//			@RequestParam String stripeTokenType, @RequestParam String stripeEmail, @RequestParam Long person_id,
-//			@RequestParam Long product_id, @RequestParam String productType) {
-//		Person person = new Person();
-//		person.setId(person_id);
-//		Course course = new Course();
-//		course.setId(product_id);
-//
-//		ChargeRequest chargeRequest = ChargeRequest.builder().person(person).product(course)
-//				.description("Course Purchase").amount(amountCents).currency(Currency.USD).stripeEmail(stripeEmail)
-//				.stripeToken(stripeToken).productType(ProductType.valueOf(productType.toUpperCase())).build();
-//
-//		return purchaseResponseMapper.toDto(purchaseFacade.purchase(chargeRequest));
-//	}
-	
 	@PostMapping("/purchase/charge")
-	public ChargeRequest charge(@ModelAttribute ChargeRequest params) {
-		return params;
+	@PreAuthorize("hasRole('master') or (hasRole('student') and @paymentService.isUserOwnerOfPayment(#chargeRequest,principal.username) )" ) 
+	public PurchaseResponse charge(@ModelAttribute ChargeRequest chargeRequest) {
+		logger.warn(chargeRequest.toString());
+		return purchaseResponseMapper.toDto(purchaseFacade.purchase(chargeRequest));
 	}
+	
 
-	@PreAuthorize("@paymentService.isUserOwnerOfPayment(#payment_id,principal.username) or hasAuthority('master')")
 	@GetMapping("/{payment_id}/refund")
+	@PreAuthorize("@paymentService.isUserOwnerOfPayment(#payment_id,principal.username) or hasAuthority('master')")
 	public PaymentDto refund(@PathVariable Long payment_id ) {
 		Payment payment= new Payment();
 		payment.setId(payment_id); 
@@ -106,6 +98,7 @@ public class PaymentController {
 	}
 
 	@GetMapping("/limit")
+	@PreAuthorize("hasRole('master')")
 	public boolean limit() {
 		refundExpirationManager.limitExpiredRefundables();
 		return true;

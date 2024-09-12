@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import com.training_system.base.Product;
 import com.training_system.base.ProductTransaction;
 import com.training_system.entity.Course;
 import com.training_system.entity.Enrollment;
@@ -109,8 +108,6 @@ public class EnrollmentPurchaseStrategy implements PurchaseStrategy {
 		Person person = userService.findByUserName(userDetails.getUsername()).getPerson();
 		
 		duplicateEnrollmentCheck(person,course);
-
-		String paymentProviderPublicKey = paymentService.getPaymentProviderPublicKey();
 		
 		return CheckoutResponse.builder()
 				.buyerName(person.getName())
