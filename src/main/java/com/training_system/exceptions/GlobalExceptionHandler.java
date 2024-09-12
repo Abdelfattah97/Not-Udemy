@@ -86,5 +86,11 @@ public class GlobalExceptionHandler {
         logger.warn(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Duplicated Lesson");
     }
+
+    @ExceptionHandler(DuplicateCourseException.class)
+    public ResponseEntity<String> duplicateLesson(DuplicateCourseException ex){
+        logger.warn(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Duplicated Course");
+    }
     
 }

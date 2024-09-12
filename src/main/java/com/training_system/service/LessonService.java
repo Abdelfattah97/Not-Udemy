@@ -48,7 +48,25 @@ public class LessonService extends BaseServiceImpl<Lesson, Long> {
         return LessonDto.fromEntityToDto(lesson);
     }
 
+    public void updateLesson(LessonDto lessonDto){
+        Lesson lesson = lessonRepo.findById(lessonDto.getId()).orElseThrow(() -> new EntityNotFoundException("There is no lesson with this id!!!"));
+        Course course = courseRepo.findById(lessonDto.getCourse_id()).orElseThrow(() -> new EntityNotFoundException("There is no course with this id!!!"));
+
+        lesson.setTitle(lessonDto.getTitle());
+        lesson.setLessonType(lessonDto.getLessonType());
+        lesson.setCourse(course);
+        lesson.setFilePath(lessonDto.getFilePath());
+
+        update(lesson);
+    }
+
     public Set<LessonDto> getLessons(){
         return LessonDto.fromEntitiesToDtos(new HashSet<>(lessonRepo.findAll()));
+    }
+
+    public void deleteLesson(Long lessonId) {
+        Lesson lesson = lessonRepo.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("There is no lesson with this id!!!"));
+
+        lessonRepo.delete(lesson);
     }
 }
