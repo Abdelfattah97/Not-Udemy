@@ -1,19 +1,19 @@
 package com.training_system.controller;
 
-import com.training_system.entity.Course;
-import com.training_system.entity.dto.LessonDto;
-import com.training_system.exceptions.DuplicateLessonException;
-import com.training_system.service.LessonService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.training_system.base.BaseAbstractController;
 import com.training_system.base.BaseControllerImpl;
 import com.training_system.entity.Lesson;
-
-import java.util.HashSet;
-import java.util.Set;
+import com.training_system.entity.dto.LessonDto;
+import com.training_system.service.LessonService;
 
 @RestController
 @RequestMapping("/api/Lesson")
