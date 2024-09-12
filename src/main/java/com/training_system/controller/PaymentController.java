@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,6 +68,24 @@ public class PaymentController {
 		return paymentDtoMapper.toDto(paymentService.findById(id));
 	}
 	
+	@PostMapping
+	@PreAuthorize("hasRole('master')")
+	public Payment insertPayment(@RequestBody Payment payment) {
+		return paymentService.insert(payment);
+	}
+	
+	@PutMapping
+	@PreAuthorize("hasRole('master')")
+	public Payment updatePayment(@RequestBody Payment payment) {
+		return paymentService.update(payment);
+	}
+		
+	@DeleteMapping("/{paymentId}")
+	@PreAuthorize("hasRole('master')")
+	public void deletePayment(@PathVariable Long paymentId) {
+		 paymentService.deleteById(paymentId);
+	}
+	
 	@PreAuthorize("hasRole('student') or hasRole('master')")
 	@GetMapping("/{productTypeName}/{productId}/checkout")
 	public CheckoutResponse checkout(@AuthenticationPrincipal UserDetails userDetails, 
@@ -88,7 +109,6 @@ public class PaymentController {
 		return purchaseResponseMapper.toDto(purchaseFacade.purchase(chargeRequest));
 	}
 	
-
 	@GetMapping("/{payment_id}/refund")
 	@PreAuthorize("@paymentService.isUserOwnerOfPayment(#payment_id,principal.username) or hasAuthority('master')")
 	public PaymentDto refund(@PathVariable Long payment_id ) {
