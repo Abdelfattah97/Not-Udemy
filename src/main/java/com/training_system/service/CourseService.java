@@ -1,5 +1,7 @@
 package com.training_system.service;
 
+import com.training_system.entity.dto.CourseDto;
+import com.training_system.exceptions.DuplicateCourseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,49 +31,22 @@ public class CourseService extends BaseServiceImpl<Course, Long> {
 	@Autowired
 	UserService userService;
 
-	public Course addLesson(Course course, Lesson lesson) {
-//		course.addLesson(lesson);
-//		lessonService.insert(lesson);
-//		return courseRepo.save(course);
-		
-		return null ;//placeholder
-	}
 
-	public Course addLesson(Long course_id, Lesson lesson) {
-//		Course course = courseRepo.findById(course_id).orElseThrow(() -> new EntityNotFoundException(
-//				String.format("No Course found with id: %s to add a lesson", course_id)));
-//		return addLesson(course, lesson);
+	public void addCourse(CourseDto courseDto) {
+		if(courseRepo.findByTitle(courseDto.getTitle()).isPresent()){
+			throw new DuplicateCourseException("There is already a course with this title!!!");
+		}
 		
-		return null ;//placeholder
-	}
-
-	
-	@Override
-	public Course insert(Course course) {
-		insertionCheck(course);
-		
-		Person instructor = course.getInstructor();
-		
-		if (instructor == null || instructor.getId() == null)
-			throw new IllegalArgumentException("Instructor id is needed when creating a course");
-
-		Long instructor_id = instructor.getId();
-		
-		instructor = personRepo.findById(instructor.getId())
-				.orElseThrow(
-				() ->new EntityNotFoundException(
-						String.format("No Instructor Found with id: %s", instructor_id)
-						));
+		Person instructor = personRepo.findById(courseDto.getInstructor_id()).orElseThrow(() -> new EntityNotFoundException("There is no instructor with this id."));
 
 		if (!userService.isInstructor(instructor.getUser()))
 			throw new UnAuthorizedException("User doesn't have a role of an instructor to create courses");
 
-		
+		Course course = new Course();
 		course.setInstructor(instructor);
-
-		return super.insert(course);
-		
-//		return null;//placeholder
+		course.setTitle(courseDto.getTitle());
+		course.setStatus(courseDto.getStatus());
+		course.setPrice(courseDto.getPrice());
+		courseRepo.save(course);
 	}
-
 }

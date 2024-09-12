@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     
     @ExceptionHandler(UnknownStatusException.class)
     public ResponseEntity<String> handleUnknownStatus(UnknownStatusException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Found Unknow Status");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).header("message", ex.getMessage()).body("Found Unknow Status");
     }
 
 
@@ -79,6 +79,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUserNotFound(UserNotFountException ex) {
     	logger.warn(ex.getMessage(),ex);
     	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("user not found!");
+    }
+
+    @ExceptionHandler(DuplicateLessonException.class)
+    public ResponseEntity<String> duplicateLesson(DuplicateLessonException ex){
+        logger.warn(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Duplicated Lesson");
+    }
+
+    @ExceptionHandler(DuplicateCourseException.class)
+    public ResponseEntity<String> duplicateLesson(DuplicateCourseException ex){
+        logger.warn(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Duplicated Course");
     }
     
     @ExceptionHandler(NoRoleRegistrationException.class)

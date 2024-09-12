@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training_system.base.BaseAbstractController;
+import com.training_system.base.BaseControllerImpl;
 import com.training_system.entity.User;
 import com.training_system.entity.dto.RegistrationAdminRequest;
 import com.training_system.entity.dto.RegistrationRequest;
@@ -28,7 +28,7 @@ import com.training_system.service.UserService;
 
 @RestController
 @RequestMapping("/api/user")
-public class UserController extends BaseAbstractController<User, Long> {
+public class UserController extends BaseControllerImpl<User, Long> {
 
 	@Autowired
 	UserService userService;

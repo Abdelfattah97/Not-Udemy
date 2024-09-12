@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training_system.base.BaseAbstractController;
+import com.training_system.base.BaseControllerImpl;
 import com.training_system.entity.Question;
 import com.training_system.entity.dto.QuestionDto;
 import com.training_system.service.QuestionService;
@@ -20,7 +20,7 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("/api/question")
-public class QuestionController extends BaseAbstractController<Question, Long>{
+public class QuestionController extends BaseControllerImpl<Question, Long>{
 	
 	@Autowired
 	private QuestionService questionService;

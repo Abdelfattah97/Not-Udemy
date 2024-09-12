@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training_system.base.BaseAbstractController;
+import com.training_system.base.BaseControllerImpl;
 import com.training_system.entity.Authority;
 import com.training_system.service.AuthorityService;
 
 @RestController
 @RequestMapping("/api/authority")
 @PreAuthorize("hasRole('privilege_manager')")
-public class AuthorityController  extends BaseAbstractController<Authority, Long>{
+public class AuthorityController  extends BaseControllerImpl<Authority, Long>{
 
 	@Autowired
 	AuthorityService authorityService;

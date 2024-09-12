@@ -15,4 +15,6 @@ public interface LessonRepo extends BaseRepository<Lesson, Long>{
 	Set<Lesson> findByCourse_Id(Long course_id);
 
 	Set<Lesson> findByCourse_IdAndCourse_Enrollments_Student_Id(Long course_id, Long student_id);
+
+	Optional<Lesson> findByTitleAndCourse_Id(String title, Long course_id);
 }
