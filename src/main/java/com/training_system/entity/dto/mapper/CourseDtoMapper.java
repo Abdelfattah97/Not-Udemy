@@ -23,7 +23,7 @@ public interface CourseDtoMapper {
 	public CourseDto toDtoDetailed(Course course) ;
 	
 	@Mapping(source="instructorId", target="instructor.id")
-	public Course toEntityCourse(CourseDto dto) ;
+	public Course toEntityCourse(CourseDto dto);
 	
 	default List<CourseDto> toDtoSimple(List<Course> courses) {
 		return courses.stream().map(this::toDtoSimple).collect(Collectors.toList());

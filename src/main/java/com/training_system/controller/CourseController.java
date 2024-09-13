@@ -40,17 +40,21 @@ public class CourseController  {
 	}
 
 	@GetMapping
-	public List<CourseDto> findAll() {
+	public List<CourseDto> findAll() {// lessons included
+		return courseMapper.toDtoDetailed( courseService.findAll());
+	}
+	@GetMapping("/detailed")
+	public List<CourseDto> findAllDetailed() { // lessons included
 		return courseMapper.toDtoDetailed( courseService.findAll());
 	}
 
 	@GetMapping("/{id}")
-	public Course findById(@PathVariable Long id) {
-		return courseService.findById(id);
+	public CourseDto findById(@PathVariable Long id) {
+		return courseMapper.toDtoDetailed(courseService.findById(id));
 	}
 
 	@PutMapping
-	@PreAuthorize("hasRole('master') or (hasRole('instructor') and @courseService.isCourseOwner(#courseDto,@userService.getCurrentUser()) )")
+	@PreAuthorize("hasRole('master') or (hasRole('instructor') and @courseService.isCourseOwner(#courseDto,@userService.getCurrentUser()))")
 	public CourseDto update(@RequestBody CourseDto courseDto) {
 		return courseMapper.toDtoSimple(courseService.update(courseMapper.toEntityCourse(courseDto)));
 	}

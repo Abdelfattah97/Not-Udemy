@@ -72,14 +72,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnSupportedOperationException.class)
     public ResponseEntity<String> handleUnSupportedOperation(UnSupportedOperationException ex) {
     	logger.warn(ex.getMessage(),ex);
-    	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("This Operation is not supported!");
+    	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("This Operation is Not Supported!");
     }
     
     
     @ExceptionHandler(UserNotFountException.class)
     public ResponseEntity<String> handleUserNotFound(UserNotFountException ex) {
     	logger.warn(ex.getMessage(),ex);
-    	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("user not found!");
+    	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("User Not Found!");
     }
 
     @ExceptionHandler(DuplicateLessonException.class)
@@ -97,13 +97,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoRoleRegistrationException.class)
     public ResponseEntity<String> handleNoRoleRegistration(NoRoleRegistrationException ex) {
     	logger.warn(ex.getMessage(),ex);
-    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("message", ex.getMessage()).body("Registering User with no role is not allowrd!");
+    	return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("message", ex.getMessage()).body("Registering User With No Role Is Not Allowrd!");
     }
     
     @ExceptionHandler(EntityAlreadyExistException.class)
     public ResponseEntity<String> handleNoRoleRegistration(EntityAlreadyExistException ex) {
     	logger.warn(ex.getMessage(),ex);
-    	return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Inserting A Duplicate record");
+    	return ResponseEntity.status(HttpStatus.CONFLICT).header("message", ex.getMessage()).body("Inserting A Duplicate Record");
     }
     @ExceptionHandler(EntitiesMatchingException.class)
     public ResponseEntity<String> handleNoRoleRegistration(EntitiesMatchingException ex) {
@@ -114,6 +114,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNoRoleRegistration(AccessDeniedException ex) {
     	logger.warn(ex.getMessage(),ex);
     	return ResponseEntity.status(HttpStatus.FORBIDDEN).header("message", ex.getMessage()).body(ex.getMessage());
+    }
+    @ExceptionHandler(ResourceUploadException.class)
+    public ResponseEntity<String> handleFileUploadException(ResourceUploadException ex) {
+    	logger.warn(ex.getMessage(),ex);
+    	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("Resource Upload Failed!");
+    }
+    @ExceptionHandler(ResourceLoadingException.class)
+    public ResponseEntity<String> handleFileUploadException(ResourceLoadingException ex) {
+    	logger.warn(ex.getMessage(),ex);
+    	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("Resource Loading Failed!");
     }
     
     

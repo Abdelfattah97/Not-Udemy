@@ -53,4 +53,5 @@ public class ResourceHandler {
         this.resource = resource;
         this.contentType = contentType;
 	}
+	
 }

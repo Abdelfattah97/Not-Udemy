@@ -53,7 +53,7 @@ public class BaseServiceImpl<T extends BaseEntity<ID>,ID> implements BaseService
 	@Override
 	public T update(T entity) {
 		if(entity.getId()==null) {
-			throw new EntityNotFoundException("Trying to update existing record without prividing its id");
+			throw new EntityNotFoundException("Trying to update existing record without providing its id");
 		}
 		
 		T exstEntity =baseRepository.findById(entity.getId())

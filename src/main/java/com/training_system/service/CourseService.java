@@ -14,13 +14,14 @@ import com.training_system.entity.enums.CourseStatus;
 import com.training_system.exceptions.DuplicateCourseException;
 import com.training_system.repo.CourseRepo;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
-public class CourseService extends BaseServiceImpl<Course, Long> implements GuestService{
-	
-	
+public class CourseService extends BaseServiceImpl<Course, Long> implements GuestService {
+
 	@Autowired
 	LessonService lessonService;
-	
+
 	@Autowired
 	CourseRepo courseRepo;
 
@@ -30,29 +31,43 @@ public class CourseService extends BaseServiceImpl<Course, Long> implements Gues
 	@Autowired
 	UserService userService;
 
-	
+	public Course update(Course newCourse) {
+
+		if (newCourse.getId() == null) {
+			throw new EntityNotFoundException("Trying to update existing record without providing its id");
+		}
+		Course oldCourse = courseRepo.findById(newCourse.getId()).orElseThrow(() -> new EntityNotFoundException(
+				String.format("Cannot Update: No entity found with the id: %s", newCourse.getId())));
+		// updating the updatable fields only
+		oldCourse.setTitle(newCourse.getTitle());
+		oldCourse.setStatus(newCourse.getStatus());
+		oldCourse.setPrice(newCourse.getPrice());
+
+		return courseRepo.save(oldCourse); //
+	}
 
 	public Course createCourse(Course course) {
-		if(courseRepo.existsByTitleAndInstructor_id(course.getTitle(),course.getInstructor().getId())){
+		if (courseRepo.existsByTitleAndInstructor_id(course.getTitle(), course.getInstructor().getId())) {
 			throw new DuplicateCourseException("There is already a course with this title!");
 		}
 		Person instructor = personService.findById(course.getInstructor().getId());
 		course.setInstructor(instructor);
 		return super.insert(course);
 	}
-	
+
 	public List<Course> searchContainingTitle(String title) {
-		return courseRepo.findByTitleContainsAndStatusAllIgnoreCase(title,CourseStatus.PUBLIC);
+		return courseRepo.findByTitleContainsAndStatusAllIgnoreCase(title, CourseStatus.PUBLIC);
 	}
-	
-	
-	public boolean isCourseOwner(Person instructor ,User user ){
-		return user.getPerson().getId()==instructor.getId();
+
+	public boolean isCourseOwner(Person instructor, User user) {
+		return user.getPerson().getId() == instructor.getId();
 	}
-	public boolean isCourseOwner(Course course ,User user ){
+
+	public boolean isCourseOwner(Course course, User user) {
 		return isCourseOwner(course.getInstructor(), user);
 	}
-	public boolean isCourseOwner(CourseDto course ,User user ){
+
+	public boolean isCourseOwner(CourseDto course, User user) {
 		return isCourseOwner(personService.findById(course.getInstructorId()), user);
 	}
 
@@ -68,7 +83,8 @@ public class CourseService extends BaseServiceImpl<Course, Long> implements Gues
 
 	@Override
 	public List<Course> searchByContent(String content) {
-		return courseRepo.findByTitleContainsOrLessons_TitleContainsAndStatusAllIgnoreCase(content, content, CourseStatus.PUBLIC);
+		return courseRepo.findByTitleContainsOrLessons_TitleContainsAndStatusAllIgnoreCase(content, content,
+				CourseStatus.PUBLIC);
 	}
-	
+
 }
