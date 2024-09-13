@@ -1,19 +1,16 @@
 package com.training_system.service;
 
-import com.training_system.entity.Lesson;
-import com.training_system.entity.User;
-import com.training_system.entity.dto.LessonDto;
+import com.training_system.entity.Country;
 import com.training_system.entity.dto.PersonDto;
+import com.training_system.repo.CountryRepo;
 import com.training_system.repo.PersonRepo;
-import com.training_system.repo.UserRepo;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.training_system.base.BaseServiceImpl;
 import com.training_system.entity.Person;
 
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class PersonService  extends BaseServiceImpl<Person, Long>{
@@ -21,9 +18,18 @@ public class PersonService  extends BaseServiceImpl<Person, Long>{
     private PersonRepo personRepo;
 
     @Autowired
-    private UserRepo userRepo;
+    private CountryRepo countryRepo;
 
-    public Set<PersonDto> getStudents(){
-        User user = userRepo.findById()
+    public PersonDto getPersonById(Long personId){
+        Person person = personRepo.findById(personId).orElseThrow(() -> new EntityNotFoundException("There is no person with this id!!!"));
+        return PersonDto.fromEntityToDto(person);
+    }
+
+    public void updatePerson(PersonDto personDto){
+        Person person = personRepo.findById(personDto.getId()).orElseThrow(() -> new EntityNotFoundException("There is no person with this id!!!"));
+        Country country = countryRepo.findById(personDto.getCountryId()).orElseThrow(() -> new EntityNotFoundException("There is no country with this id"));
+        person.setCountry(country);
+        person.setName(personDto.getName());
+        update(person);
     }
 }
