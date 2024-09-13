@@ -7,7 +7,7 @@ import com.training_system.base.BaseControllerImpl;
 import com.training_system.entity.Country;
 
 @RestController
-@RequestMapping("/api/Country")
+@RequestMapping("/api/country")
 public class CountryController extends BaseControllerImpl<Country, Long> {
 
 }

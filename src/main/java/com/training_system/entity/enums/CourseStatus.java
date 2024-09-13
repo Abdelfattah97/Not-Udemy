@@ -2,7 +2,7 @@ package com.training_system.entity.enums;
 
 public enum CourseStatus  {
 	
-	PUBLIC(1);
+	PUBLIC(1),Private(2);
 	private CourseStatus(int value) {
 		this.value=value;
 	}

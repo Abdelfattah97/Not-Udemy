@@ -31,12 +31,7 @@ public class EnrollmentPurchaseStrategy implements PurchaseStrategy {
 	@Autowired
 	CourseService courseService;
 	@Autowired
-	private PersonService personService;
-	@Autowired
 	UserService userService;
-
-	@Autowired
-	private ProductConfirmationFacade productConfirmationFacade;
 
 	Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -6,24 +6,32 @@ import java.util.stream.Collectors;
 import com.training_system.entity.Course;
 import com.training_system.entity.enums.CourseStatus;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 public class CourseDto {
 	private Long id;
 	private String title;
 	private CourseStatus status;
 	private Integer price;
-	private Long instructor_id;
+	private Long instructorId;
+	private String instructorName;
+	private Set<LessonDto> lessons;
+	
 	
 	public static CourseDto fromEntityToDto(Course course) {
-		return new CourseDto(course.getId(), course.getTitle(), course.getStatus(), course.getPrice(), course.getInstructor().getId());
+	return CourseDto.builder()
+			.id(course.getId())
+			.title(course.getTitle())
+			.status(course.getStatus())
+			.price(course.getPrice())
+			.instructorId(course.getInstructor().getId())
+			.instructorName(course.getInstructor().getName())
+			.build();
 	}
 	
 	public static Set<CourseDto> fromEntitiesToDto(Set<Course> courses){

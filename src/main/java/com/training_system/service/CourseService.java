@@ -1,22 +1,21 @@
 package com.training_system.service;
 
-import com.training_system.entity.dto.CourseDto;
-import com.training_system.exceptions.DuplicateCourseException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.training_system.base.BaseServiceImpl;
 import com.training_system.entity.Course;
-import com.training_system.entity.Lesson;
 import com.training_system.entity.Person;
-import com.training_system.exceptions.UnAuthorizedException;
+import com.training_system.entity.User;
+import com.training_system.entity.dto.CourseDto;
+import com.training_system.entity.enums.CourseStatus;
+import com.training_system.exceptions.DuplicateCourseException;
 import com.training_system.repo.CourseRepo;
-import com.training_system.repo.PersonRepo;
-
-import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class CourseService extends BaseServiceImpl<Course, Long> {
+public class CourseService extends BaseServiceImpl<Course, Long> implements GuestService{
 	
 	
 	@Autowired
@@ -26,27 +25,50 @@ public class CourseService extends BaseServiceImpl<Course, Long> {
 	CourseRepo courseRepo;
 
 	@Autowired
-	PersonRepo personRepo;
+	PersonService personService;
 
 	@Autowired
 	UserService userService;
 
+	
 
-	public void addCourse(CourseDto courseDto) {
-		if(courseRepo.findByTitle(courseDto.getTitle()).isPresent()){
-			throw new DuplicateCourseException("There is already a course with this title!!!");
+	public Course createCourse(Course course) {
+		if(courseRepo.existsByTitleAndInstructor_id(course.getTitle(),course.getInstructor().getId())){
+			throw new DuplicateCourseException("There is already a course with this title!");
 		}
-		
-		Person instructor = personRepo.findById(courseDto.getInstructor_id()).orElseThrow(() -> new EntityNotFoundException("There is no instructor with this id."));
-
-		if (!userService.isInstructor(instructor.getUser()))
-			throw new UnAuthorizedException("User doesn't have a role of an instructor to create courses");
-
-		Course course = new Course();
+		Person instructor = personService.findById(course.getInstructor().getId());
 		course.setInstructor(instructor);
-		course.setTitle(courseDto.getTitle());
-		course.setStatus(courseDto.getStatus());
-		course.setPrice(courseDto.getPrice());
-		courseRepo.save(course);
+		return super.insert(course);
 	}
+	
+	public List<Course> searchContainingTitle(String title) {
+		return courseRepo.findByTitleContainsAndStatusAllIgnoreCase(title,CourseStatus.PUBLIC);
+	}
+	
+	
+	public boolean isCourseOwner(Person instructor ,User user ){
+		return user.getPerson().getId()==instructor.getId();
+	}
+	public boolean isCourseOwner(Course course ,User user ){
+		return isCourseOwner(course.getInstructor(), user);
+	}
+	public boolean isCourseOwner(CourseDto course ,User user ){
+		return isCourseOwner(personService.findById(course.getInstructorId()), user);
+	}
+
+	@Override
+	public List<Course> searchByTitle(String title) {
+		return courseRepo.findByTitleContainsAndStatusAllIgnoreCase(title, CourseStatus.PUBLIC);
+	}
+
+	@Override
+	public List<Course> searchByInstructorName(String instructorNamme) {
+		return courseRepo.findByInstructor_NameContainsAndStatusAllIgnoreCase(instructorNamme, CourseStatus.PUBLIC);
+	}
+
+	@Override
+	public List<Course> searchByContent(String content) {
+		return courseRepo.findByTitleContainsOrLessons_TitleContainsAndStatusAllIgnoreCase(content, content, CourseStatus.PUBLIC);
+	}
+	
 }

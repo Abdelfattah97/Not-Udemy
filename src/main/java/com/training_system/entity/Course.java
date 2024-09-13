@@ -8,6 +8,7 @@ import com.training_system.base.Product;
 import com.training_system.converter.CourseStatusConverter;
 import com.training_system.entity.enums.CourseStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -32,6 +33,7 @@ public class Course  extends BaseEntity<Long> implements Product{
 	private String title;
 	
 	@Convert(converter = CourseStatusConverter.class)
+	@Column(nullable = false)
 	private CourseStatus status;
 	
 	/**
@@ -50,7 +52,7 @@ public class Course  extends BaseEntity<Long> implements Product{
 	@OneToMany(mappedBy = "course")
 	private Set<Enrollment> enrollments;
 	
-	@OneToMany(mappedBy = "course")
+	@OneToMany(mappedBy = "course", cascade = CascadeType.REMOVE)
 	private Set<Lesson> lessons;
 	
 	public void addLesson(Lesson lesson){
