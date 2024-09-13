@@ -51,28 +51,16 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Override
-	@PreAuthorize("hasAuthority('master')")
 	public List<Payment> findAll() {
 		return super.findAll();
 	}
 
 	public List<Payment> findAll(UserDetails userDetails) {
-//		String username = userDetails.getUsername();
-//		User user = userService.findByUserName(username);
-		User user = userService.getCurrentUser();
-		boolean isAdmin = user.getRoles().stream().filter(role -> role.getName().equalsIgnoreCase("master")).findAny()
-				.isPresent();
-		if (isAdmin) {
-			return findAll();
-		} else {
-			return findAllByUser(user);
-		}
+			return findAllByUser(userService.findByUserName(userDetails.getUsername()));
 	}
 
 	@Override
-	@PreAuthorize("hasAuthority('master') or @paymentService.isUserOwnerOfPayment(#id,principal.username)")
 	public Payment findById(Long id) {
-//		is
 		return super.findById(id);
 	}
 
@@ -84,6 +72,11 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	public boolean isUserOwnerOfPayment(Long payment_id, String userName) {
 		Payment payment = findById(payment_id);
 		User user = userService.findByUserName(userName);
+		return isUserOwnerOfPayment(payment, user);
+	}
+	public boolean isUserOwnerOfPayment(Long payment_id, User user) {
+		Payment payment = findById(payment_id);
+//		 user = userService.findById(user.getId());
 		return isUserOwnerOfPayment(payment, user);
 	}
 	public boolean isUserOwnerOfPayment(Payment payment, User user) {
@@ -129,7 +122,6 @@ public class PaymentService extends BaseServiceImpl<Payment, Long> {
 	}
 
 	// Refunds Related
-	@PreAuthorize("hasAuthority('master') or @paymentService.isUserOwnerOfPayment(#payment_id,principal.username)")
 	@Transactional
 	protected Payment refund(Long payment_id) {
 		Payment payment = findById(payment_id);

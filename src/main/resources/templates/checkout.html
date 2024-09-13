@@ -19,6 +19,8 @@
 				<input type="hidden" , th:value=${product.id} name="productId">
 				<input type="hidden" , th:value=${person.id} name="personId">
 				<input type="hidden" , th:value=${productType} name="productType">
+<!-- 				<input type="hidden" , th:value=${''} name="description"> -->
+				<input type="hidden" , th:value=${currency} name="currency">
 				<!-- NOTE: data-key/data-amount/data-currency will be rendered by Thymeleaf -->
 				<script src='https://checkout.stripe.com/checkout.js'
 					class='stripe-button'

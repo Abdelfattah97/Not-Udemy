@@ -26,7 +26,7 @@ public class Lesson extends BaseEntity<Long>  {
 	private String title;
 	
 	@ManyToOne
-	@JoinColumn(name="course_id")
+	@JoinColumn(name="course_id",nullable = false)
 	private Course course;
 	
 	@Column(name="file_path", nullable = true)

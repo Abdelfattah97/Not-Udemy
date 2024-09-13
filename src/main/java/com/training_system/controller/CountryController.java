@@ -10,7 +10,7 @@ import com.training_system.entity.Country;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/Country")
+@RequestMapping("/api/country")
 public class CountryController extends BaseControllerImpl<Country, Long> {
     @Autowired
     private CountryService countryService;

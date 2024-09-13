@@ -24,7 +24,7 @@ public class SecurityConfig {
     // Enable HTTP Basic Authentication
     http.httpBasic(Customizer.withDefaults());
 
-    // Enable Form Authentication
+//     Enable Form Authentication
     http.formLogin(form -> form
         .loginProcessingUrl("/authenticate")
         .failureHandler((request, response, exception) -> response.setStatus(401))
@@ -33,8 +33,9 @@ public class SecurityConfig {
     // Configure Authorization
     http.authorizeHttpRequests(auth -> auth
     		.requestMatchers("/api/user/register").permitAll()
-//    		.requestMatchers("/api/course/add").hasRole("ADMIN")
-    		.anyRequest().authenticated());
+    		.requestMatchers("/api/course/public/search/by/*").permitAll()
+    		.anyRequest().authenticated()
+    		).anonymous(Customizer.withDefaults());
 
     return http.build();
   }
