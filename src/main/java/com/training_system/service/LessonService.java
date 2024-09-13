@@ -26,9 +26,12 @@ public class LessonService extends BaseServiceImpl<Lesson, Long> {
     @Autowired
     private CourseRepo courseRepo;
 
+    @Autowired
+    private ResourceService resourceService;
+
     public void addLesson(LessonDto lessonDto){
-        if(lessonRepo.findById(lessonDto.getId()).isPresent()){
-            throw new DuplicateLessonException("This Lesson with id = " + lessonDto.getId() + " already exists");
+        if(lessonDto.getId() != null){
+            throw new IllegalArgumentException("Inserting new record with id is not allowed");
         }
         if(lessonRepo.findByTitleAndCourse_Id(lessonDto.getTitle(), lessonDto.getCourse_id()).isPresent()){
             throw new DuplicateLessonException(String.format("This lesson with title = %s, and course_id = %d", lessonDto.getTitle(), lessonDto.getCourse_id()));
