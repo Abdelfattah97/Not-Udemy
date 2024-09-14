@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -124,6 +126,16 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleFileUploadException(ResourceLoadingException ex) {
     	logger.warn(ex.getMessage(),ex);
     	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("Resource Loading Failed!");
+    }
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<String> handleFileUploadException(NoResourceFoundException ex ) {
+    	logger.warn(ex.getMessage(),ex);
+    	return ResponseEntity.status(HttpStatus.NOT_FOUND).header("message", ex.getMessage()).body("(404 Not_Found) Please visit /docs for more information.");
+    }
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<String> handleFileUploadException(NullPointerException ex ) {
+    	logger.warn(ex.getMessage(),ex);
+    	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("You may have missed a required value! if you are sure of sending a valid request please contact us!");
     }
     
     

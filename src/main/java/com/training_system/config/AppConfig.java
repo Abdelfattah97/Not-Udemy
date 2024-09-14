@@ -1,6 +1,5 @@
 package com.training_system.config;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -187,30 +186,32 @@ public class AppConfig implements CommandLineRunner {
 			mstr.addRoles(admineRole,privilege_manager);
 			return userRepo.save(mstr);
 		});
+		
 
 		insertInstructorAndCourse(instructor);
-		insertStudent(student, "Student 1");
-		insertStudent(student2, "Student 2");
+		insertPerson(student, "Student 1");
+		insertPerson(student2, "Student 2");
+		insertPerson(master, "master");
 	}
 
-	void insertStudent(User user, String studentName) {
+	private Person insertPerson(User user, String name) {
 		Country egypt = countryRepo.findByCountryName("Egypt").orElseGet(() -> {
 			Country country = new Country();
 			country.setCountryName("Egypt");
 			return countryRepo.save(country);
 		});
 
-		Person student = personRepo.findByName(studentName).orElseGet(() -> {
+		return personRepo.findByName(name).orElseGet(() -> {
 			Person person = new Person();
 			person.setUser(user);
 			person.setCountry(egypt);
-			person.setName(studentName);
+			person.setName(name);
 			return personRepo.save(person);
 		});
 
 	}
 
-	void insertInstructorAndCourse(User user) {
+	private void insertInstructorAndCourse(User user) {
 		Country egypt = countryRepo.findByCountryName("Egypt").orElseGet(() -> {
 			Country country = new Country();
 			country.setCountryName("Egypt");
@@ -227,7 +228,7 @@ public class AppConfig implements CommandLineRunner {
 		insertCourse(instructor);
 	}
 
-	void insertCourse(Person instructor) {
+	private void insertCourse(Person instructor) {
 		if (courseService.findAll().isEmpty()) {
 			Course course = new Course();
 			course.setInstructor(instructor);

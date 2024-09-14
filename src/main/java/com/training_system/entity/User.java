@@ -13,6 +13,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -34,16 +35,20 @@ public class User extends BaseEntity<Long>  {
 	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 	private Person person;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER )
 	@JoinTable(
 			name="users_roles",
 			joinColumns = @JoinColumn(name="user_id"),
 			inverseJoinColumns = @JoinColumn(name="role_id")
+			,uniqueConstraints = @UniqueConstraint(columnNames = {"user_id","role_id"})
 			)
 	private Set<Role> roles = new HashSet<>();
 
 	public void addRoles(Role... roles) {
 		this.roles.addAll(Set.of(roles));
+	}
+	public void addRoles(Set<Role> roles) {
+		this.roles.addAll(roles);
 	}
 	
 }

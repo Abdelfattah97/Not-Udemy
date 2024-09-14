@@ -13,7 +13,7 @@ public class OpenApiConfig {
   OpenAPI customOpenAPI() {
     Info apiInfo = new Info()
         .version("1.0.0")
-        .title("Training System API");
+        .title("E Learning System API");
 
     return new OpenAPI().info(apiInfo);
   }

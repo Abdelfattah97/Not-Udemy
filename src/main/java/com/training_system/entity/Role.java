@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.training_system.base.BaseEntity;
 
 import jakarta.persistence.Entity;
@@ -16,18 +17,21 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.UniqueConstraint;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true ,onlyExplicitlyIncluded = true)
 @ToString(callSuper = true)
 public class Role extends BaseEntity<Long> implements GrantedAuthority {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@EqualsAndHashCode.Include
 	private Long id;
 
 	private String name;
@@ -46,6 +50,7 @@ public class Role extends BaseEntity<Long> implements GrantedAuthority {
 		this.authorities.addAll(authorities);
 	}
 	@Override
+	@JsonIgnore
 	public String getAuthority() {
 		return String.format("ROLE_%s", getName());
 	}

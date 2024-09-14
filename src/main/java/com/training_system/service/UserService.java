@@ -60,6 +60,25 @@ public class UserService extends BaseServiceImpl<User, Long> implements UserDeta
 		entity.setPassword(passwordEncoder.encode(entity.getPassword()));
 		return super.insert(entity);
 	}
+	
+	@Override
+	public User update(User user) {
+		if(user.getId()==null) {
+			throw new EntityNotFoundException("Trying to update existing record(User) without providing its id");
+		}
+		
+		User existUser =userRepo.findById(user.getId())
+				.orElseThrow(()->
+				 new EntityNotFoundException(
+						 String.format("Cannot Update: No User found with the id: %s", user.getId())));
+	
+		existUser.setEmail(user.getEmail());
+		existUser.setPassword(passwordEncoder.encode(user.getPassword()));
+		existUser.addRoles(user.getRoles());
+		existUser.getPerson().setName(user.getPerson().getName());
+		
+		return userRepo.save(user);
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

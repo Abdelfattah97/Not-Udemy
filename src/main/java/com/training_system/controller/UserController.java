@@ -46,16 +46,10 @@ public class UserController {
 		return userMapper.toDto(userService.findById(id));
 	}
 
-	@PostMapping	
-	@PreAuthorize("hasRole('master')")
-	public UserDto Insert(@RequestBody User entity) {
-		return userMapper.toDto(userService.insert(entity));
-	}
-
 	@PutMapping
 	@PreAuthorize("hasRole('master') or #id==@userService.getCurrentUser().getId()")
-	public UserDto update(@RequestBody User entity) {
-		return userMapper.toDto(userService.update(entity));
+	public UserDto update(@RequestBody UserDto entity) {
+		return userMapper.toDto(userService.update(userMapper.toEntity(entity)));
 	}
 
 	@PutMapping("/{user_id}/add/role/{role_id}")

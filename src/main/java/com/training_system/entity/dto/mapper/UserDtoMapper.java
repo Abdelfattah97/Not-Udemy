@@ -16,9 +16,11 @@ import com.training_system.entity.dto.UserDto;
 @Mapper(componentModel = "spring")
 public interface UserDtoMapper {
 
-	@Mapping(source = "roles", target="roles",qualifiedByName = "rolesNames")
-	@Mapping(source = "roles", target="authorities",qualifiedByName = "authoritiesNames")
+//	@Mapping(source = "roles.authorities", target="authorities",qualifiedByName = "authoritiesNames")
 	@Mapping(source = "person.name", target="name")
+	@Mapping(source = "id", target="userId")
+	@Mapping(source = "person.id", target="personId")
+	@Mapping(source = "password", target="password",ignore=true)
 	public UserDto toDto(User user);
 	 
 	default List<UserDto> toDto(List<User> users) {
@@ -36,5 +38,13 @@ public interface UserDtoMapper {
 	                .map(Authority::getName)
 	                .collect(Collectors.toList());
 	 }
+
+	 
+	 @Mapping(source = "userId", target="id")
+	 @Mapping(source = "personId", target="person.id")
+	 @Mapping(source = "userId", target="person.user.id")
+	 @Mapping(source = "name", target="person.name")
+	public User toEntity(UserDto entity);
+	
 	 
 }

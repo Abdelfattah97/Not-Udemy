@@ -10,21 +10,31 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.training_system.entity.dto.LessonDto;
 import com.training_system.service.LessonService;
+import com.training_system.service.ResourceService;
 
 @RestController
 @RequestMapping("/api/lesson")
 public class LessonController {	
 	@Autowired
     private LessonService lessonService;
+	
+	@Autowired 
+	ResourceService resourceService;
 
 	
     @PostMapping("/addlesson")
     @PreAuthorize("hasRole('master') or(hasRole('instructor') and @lessonService.isLessonOwner(#lessonDto.id,@userService.getCurrentUser()))")
-    public void addLesson(@RequestBody LessonDto lessonDto){
+    public void addLesson(@RequestPart("lesson") LessonDto lessonDto, @RequestPart("file") MultipartFile uploadedFile){
+        if(uploadedFile != null && !uploadedFile.isEmpty()){
+            String filePath = resourceService.upload(uploadedFile);
+            lessonDto.setFilePath(filePath);
+        }
         lessonService.addLesson(lessonDto);
     }
 
