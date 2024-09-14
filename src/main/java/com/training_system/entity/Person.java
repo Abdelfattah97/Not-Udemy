@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, of = {"name"})
 @ToString(callSuper = true)
 public class Person extends BaseEntity<Long> {
 
@@ -45,8 +45,8 @@ public class Person extends BaseEntity<Long> {
 	@ManyToMany
 	@JoinTable(
 			name = "attendance",
-			joinColumns = @JoinColumn(name="lesson_id"),
-			inverseJoinColumns = @JoinColumn(name="student_id")
+			joinColumns = @JoinColumn(name="student_id"),
+			inverseJoinColumns = @JoinColumn(name="lesson_id")
 			)
 	private Set<Lesson> attendedLessons;
 	

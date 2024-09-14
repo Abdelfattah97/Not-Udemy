@@ -40,7 +40,7 @@ public class NavigationController {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@PreAuthorize("hasAuthority('enroll_course')")
+	@PreAuthorize("hasAuthority('enroll_course') or hasRole('master')")
 	@GetMapping("api/payment/{productTypename}/{productId}/checkout/ui")
 	public String checkout(Model model, @AuthenticationPrincipal UserDetails userDetails,
 			@PathVariable Long productId ,@PathVariable String productTypename ) {

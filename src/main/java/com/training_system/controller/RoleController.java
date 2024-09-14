@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.training_system.base.BaseControllerImpl;
 import com.training_system.entity.Role;
 import com.training_system.service.RoleService;
 
@@ -21,7 +20,7 @@ import com.training_system.service.RoleService;
 @RestController
 @RequestMapping("/api/role")
 @PreAuthorize("hasRole('privilege_manager')")
-public class RoleController extends BaseControllerImpl<Role, Long> {
+public class RoleController  {
 	
 	@Autowired
 	RoleService roleService;

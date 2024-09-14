@@ -7,6 +7,7 @@ import com.training_system.entity.Lesson;
 import com.training_system.entity.enums.LessonType;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class LessonDto {
 	private Long id;
 	private String title;
@@ -24,13 +26,13 @@ public class LessonDto {
 	
 
 	public static LessonDto fromEntityToDto(Lesson lesson) {
-		return new LessonDto(
-				lesson.getId(), 
-				lesson.getTitle(),
-				lesson.getCourse().getId(),
-				lesson.getFilePath(),
-				lesson.getLessonType()
-			);
+		return	LessonDto.builder()
+			.id(lesson.getId())
+			.title(lesson.getTitle())
+			.course_id(lesson.getCourse().getId())
+			.filePath(lesson.getFilePath())
+			.lessonType(lesson.getLessonType())
+			.build();
 	}
 	
 	public static Set<LessonDto> fromEntitiesToDtos(Set<Lesson> lessons){

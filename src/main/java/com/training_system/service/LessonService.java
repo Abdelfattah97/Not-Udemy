@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.training_system.base.BaseServiceImpl;
 import com.training_system.entity.Lesson;
+import com.training_system.entity.User;
 import com.training_system.repo.LessonRepo;
 
 import java.util.HashSet;
@@ -68,5 +69,13 @@ public class LessonService extends BaseServiceImpl<Lesson, Long> {
         Lesson lesson = lessonRepo.findById(lessonId).orElseThrow(() -> new EntityNotFoundException("There is no lesson with this id!!!"));
 
         lessonRepo.delete(lesson);
+    }
+
+    public boolean isLessonOwner(Lesson lesson , User user) {
+    	return lesson.getCourse().getInstructor().getUser().getId().equals(user.getId());
+    }
+    
+    public boolean isLessonOwner(Long lessonId , User user) {
+    	return isLessonOwner(findById(lessonId), user);
     }
 }

@@ -21,6 +21,10 @@ public interface UserDtoMapper {
 	@Mapping(source = "person.name", target="name")
 	public UserDto toDto(User user);
 	 
+	default List<UserDto> toDto(List<User> users) {
+		return users.stream().map(this::toDto).collect(Collectors.toList());
+	}
+	
 	 @Named(value = "rolesNames")
 		default List<String> rolesToNames(Set<Role> roles){
 			 return roles.stream().map(r->r.getName()).collect(Collectors.toList());

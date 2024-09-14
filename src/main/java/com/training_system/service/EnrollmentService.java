@@ -1,13 +1,22 @@
 package com.training_system.service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +26,6 @@ import com.training_system.entity.Enrollment;
 import com.training_system.entity.Lesson;
 import com.training_system.entity.Payment;
 import com.training_system.entity.Person;
-import com.training_system.entity.Question;
 import com.training_system.entity.User;
 import com.training_system.entity.dto.CourseDto;
 import com.training_system.entity.dto.LessonDto;
@@ -33,16 +41,6 @@ import com.training_system.repo.PaymentRepo;
 import com.training_system.repo.PersonRepo;
 import com.training_system.repo.UserRepo;
 import com.training_system.utils.ResourceHandler;
-
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.data.convert.Jsr310Converters.LocalDateTimeToDateConverter;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-
-import java.io.IOException;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -66,6 +64,8 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	
 	@Autowired
 	private UserRepo userRepo;
+	
+	Logger logger = LoggerFactory.getLogger(getClass());
 	
 	@Autowired
 	@Lazy
@@ -91,6 +91,12 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 		}
 	}
 
+	/**
+	 * finds enrollment by course_id and student_id
+	 * @param course_id the course's id 
+	 * @param person_id the person's id'
+	 * @return the distinct queried enrollment or null if not found
+	 */
 	public Enrollment findByCourseStudent(Long course_id , Long person_id) {
 		return enrollmentRepo.findByCourse_IdAndStudent_Id(course_id,person_id).orElse(null);
 	}
@@ -169,6 +175,7 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 	        		productConfirmationFacade.confirmPayment(payment, null);
 	        	}
 	        	student.addAttendedLesson(lesson);
+	        	logger.error("lesson id before saving person"+lesson.getId());
 				personRepo.save(student);
 			}
 	        return ResponseEntity.ok()
@@ -252,5 +259,51 @@ public class EnrollmentService extends BaseServiceImpl<Enrollment, Long>{
 
 		enrollmentRepo.delete(enrollment);
 	}
+	
+	/**
+	 *Checks the existence of an enrollment and ensures the passed user is the owner of it
+	 * @param course_id  the course id 
+	 * @param student_id the student id
+	 * @param user the user that will be checked for owning the enrollment
+	 * @return true if the enrollment exists and the user is the owner
+	 * @author Abdelfattah
+	 */
+	public boolean isEnrollmentOwner(Long course_id , Long student_id , User user){
+		Enrollment enrollment = enrollmentRepo.findByCourse_IdAndStudent_Id(course_id, student_id).orElse(null);
+		if( enrollment != null ) {
+			if( enrollment.getBuyer().getId().equals(user.getPerson().getId())){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if the passed user is enrolled in a specific course
+	 * @param course_id  the course id 
+	 * @param user the user that will be checked for enrolling in the course
+	 * @return true if the user is enrolled in the course
+	 * @author Abdelfattah
+	 */
+	public boolean isCourseEnrolled(Long course_id , User user){
+		return enrollmentRepo.findByCourse_IdAndStudent_Id(course_id, user.getPerson().getId()).orElse(null) != null;
+	}
+	/**
+	 * Checks if the passed user is enrolled in a specific course by lesson_id
+	 * is depending and a more specific version of {@link EnrollmentService#isCourseEnrolled(Long, User)}
+	 * @param lesson_id  the lessons's id to check its parent course for an enrollment 
+	 * @param user the user that will be checked for enrolling in the course
+	 * @return true if the user is enrolled in the course
+	 * @author Abdelfattah
+	 */
+	public boolean isLessonEnrolled(Long lesson_id , User user){
+		Lesson lesson =lessonRepo.findById(lesson_id).orElse(null);
+		if( lesson!= null ) {
+          return isCourseEnrolled(lesson.getCourse().getId(), user);
+        }
+		return false;
+	}
+
+	
 }
 

@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Builder
 public class CourseDto {
-	private Long id;
+	private Long courseId;
 	private String title;
 	private CourseStatus status;
 	private Integer price;
@@ -25,7 +25,7 @@ public class CourseDto {
 	
 	public static CourseDto fromEntityToDto(Course course) {
 	return CourseDto.builder()
-			.id(course.getId())
+			.courseId(course.getId())
 			.title(course.getTitle())
 			.status(course.getStatus())
 			.price(course.getPrice())

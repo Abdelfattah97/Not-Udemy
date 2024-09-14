@@ -20,7 +20,7 @@ import lombok.ToString;
 @Entity
 @Table(name="usr")
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true , of= {"username","email"})
 @ToString(callSuper = true)
 public class User extends BaseEntity<Long>  {
 	@Column(nullable = false,unique = true)

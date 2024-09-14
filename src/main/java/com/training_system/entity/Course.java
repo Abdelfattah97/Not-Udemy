@@ -25,7 +25,7 @@ import lombok.ToString;
 
 @Entity
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true , of={"title"})
 @ToString(callSuper = true)
 public class Course  extends BaseEntity<Long> implements Product{
 	

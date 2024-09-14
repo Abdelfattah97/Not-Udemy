@@ -24,9 +24,10 @@ public class SecurityConfig {
     // Enable HTTP Basic Authentication
     http.httpBasic(Customizer.withDefaults());
 
-//     Enable Form Authentication
+    //Enable Form Authentication
     http.formLogin(form -> form
         .loginProcessingUrl("/authenticate")
+        .defaultSuccessUrl("/doc")
         .failureHandler((request, response, exception) -> response.setStatus(401))
         .permitAll());
 

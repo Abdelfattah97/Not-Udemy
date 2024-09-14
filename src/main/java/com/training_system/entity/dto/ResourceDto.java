@@ -1,7 +1,6 @@
-package com.training_system.entity.dto.mapper;
+package com.training_system.entity.dto;
 
-import java.io.FileInputStream;
-
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 
 import lombok.Data;
@@ -12,6 +11,6 @@ public class ResourceDto {
 	private Long size_MB;
 	private MediaType mediaType;
 	private String fileName;
-	private FileInputStream dataInputStream;
+	private Resource resource;
 	
 }

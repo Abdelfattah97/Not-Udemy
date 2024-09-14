@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.training_system.entity.dto.mapper.ResourceDto;
+import com.training_system.entity.dto.ResourceDto;
 import com.training_system.exceptions.ResourceLoadingException;
 import com.training_system.exceptions.ResourceUploadException;
 import com.training_system.utils.ResourceHandler;
@@ -42,6 +42,7 @@ public class ResourseServiceImpl implements ResourceService {
 		ResourceDto dto = new ResourceDto();
 		dto.setFileName(resourceHandler.getResource().getFilename());
 		dto.setMediaType(MediaType.valueOf(resourceHandler.getContentType()));
+		dto.setResource(resourceHandler.getResource());
 		try {
 			dto.setSize_MB(resourceHandler.getResource().contentLength() / (int) (1024.0 * 1024.0));
 		} catch (IOException e) {

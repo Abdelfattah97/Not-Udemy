@@ -3,6 +3,7 @@ package com.training_system.controller;
 import com.training_system.entity.dto.PersonDto;
 import com.training_system.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +18,7 @@ public class PersonController {
     }
 
     @PutMapping("/updateperrson")
+    @PreAuthorize("hasRole('master') or @userService.getCurrentUser().getPerson().getId()== #personDto.getId ")
     public void updatePerson(@RequestBody PersonDto personDto){
         personService.updatePerson(personDto);
     }
