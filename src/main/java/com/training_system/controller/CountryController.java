@@ -17,7 +17,6 @@ import com.training_system.service.CountryService;
 
 @RestController
 @RequestMapping("/api/country")
-@PreAuthorize("hasRole('master')")
 public class CountryController {
     @Autowired
     private CountryService countryService;
@@ -28,6 +27,7 @@ public class CountryController {
     }
 
     @PostMapping("/addcountry")
+    @PreAuthorize("hasRole('master')")
     public void addCountry(@RequestBody Country country){
         countryService.addCountry(country);
     }

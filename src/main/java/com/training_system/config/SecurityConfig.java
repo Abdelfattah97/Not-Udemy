@@ -35,6 +35,7 @@ public class SecurityConfig {
     http.authorizeHttpRequests(auth -> auth
     		.requestMatchers("/api/user/register").permitAll()
     		.requestMatchers("/api/course/public/search/by/*").permitAll()
+    		.requestMatchers("/api/country/getcountries").permitAll()
     		.anyRequest().authenticated()
     		).anonymous(Customizer.withDefaults());
 

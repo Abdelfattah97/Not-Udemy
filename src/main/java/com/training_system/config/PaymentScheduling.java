@@ -17,7 +17,7 @@ public class PaymentScheduling {
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	@Scheduled(cron = "0 * * * * ?")
+//	@Scheduled(cron = "0 * * * * ?")
 	public void everyMinCheck() {
 		logger.info("Cron job Started");
 //		refundExpirationManager.limitExpiredRefundables();
