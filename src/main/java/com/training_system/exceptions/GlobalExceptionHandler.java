@@ -137,6 +137,11 @@ public class GlobalExceptionHandler {
     	logger.warn(ex.getMessage(),ex);
     	return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("message", ex.getMessage()).body("You may have missed a required value! if you are sure of sending a valid request please contact us!");
     }
+    @ExceptionHandler(PasswordResetTokenException.class)
+    public ResponseEntity<String> handlePasswordResetTokenException(PasswordResetTokenException ex) {
+        logger.warn(ex.getMessage(),ex);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("message", ex.getMessage()).body(ex.getMessage());
+    }
     
     
     

@@ -27,7 +27,7 @@ public class SecurityConfig {
     //Enable Form Authentication
     http.formLogin(form -> form
         .loginProcessingUrl("/authenticate")
-        .defaultSuccessUrl("/doc")
+        .defaultSuccessUrl("/docs")
         .failureHandler((request, response, exception) -> response.setStatus(401))
         .permitAll());
 
@@ -36,6 +36,8 @@ public class SecurityConfig {
     		.requestMatchers("/api/user/register").permitAll()
     		.requestMatchers("/api/course/public/search/by/*").permitAll()
     		.requestMatchers("/api/country/getcountries").permitAll()
+    		.requestMatchers("/login/*").permitAll()
+    		.requestMatchers("/error").permitAll()
     		.anyRequest().authenticated()
     		).anonymous(Customizer.withDefaults());
 

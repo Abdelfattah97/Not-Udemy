@@ -1,5 +1,6 @@
 package com.training_system.service;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,7 @@ import com.training_system.entity.Authority;
 import com.training_system.entity.Person;
 import com.training_system.entity.Role;
 import com.training_system.entity.User;
+import com.training_system.exceptions.UserNotFountException;
 import com.training_system.repo.RoleRepo;
 import com.training_system.repo.UserRepo;
 
@@ -117,6 +119,25 @@ public class UserService extends BaseServiceImpl<User, Long> implements UserDeta
 
 	public boolean isCurrentUser(Person person) {
 		return getCurrentUser().getPerson().getId().equals(person.getId());
+	}
+	
+	public User updatePassword(User user,String password) {
+		Objects.requireNonNull(user,"Trying to update a null user");
+		Objects.requireNonNull(user.getId(), "Updating a user's password requires the user's id which is not provided.");
+		final Long userId = user.getId();	
+		user =userRepo.findById(user.getId()).orElseThrow(
+				()-> new UserNotFountException(String.format("Update failed: The user with id %s is not found!", userId))
+				);
+		user.setPassword(passwordEncoder.encode(password));
+		return userRepo.save(user);
+	}
+
+	public User findByEmail(String email) {
+		return userRepo.findByUsernameOrEmail(null, email).orElseThrow(()->
+		new EntityNotFoundException(String.format("No User Found for email: %s " , email))
+				);
+		
+		
 	}
 
 }
